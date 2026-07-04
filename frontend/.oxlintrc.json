@@ -1,0 +1,52 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc", "unicorn", "import", "jsx-a11y"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  "env": { "browser": true, "es2022": true },
+  "globals": { "__GATEWAY__": "readonly" },
+  "rules": {
+    "no-unused-vars": "error",
+    "react/exhaustive-deps": "warn",
+    "react/react-in-jsx-scope": "off",
+    "import/no-cycle": ["error", { "ignoreTypes": true }],
+    "jsx-a11y/no-autofocus": "off",
+    "no-await-in-loop": "off",
+    "import/no-unassigned-import": ["error", { "allow": ["**/*.css", "katex/contrib/mhchem"] }],
+    "typescript/no-explicit-any": "error",
+    "eqeqeq": "error",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-underscore-dangle": ["warn", { "allow": ["__GATEWAY__"] }],
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["**/shared/mocks/data"],
+            "message": "Мок-данные допустимы только в демо-страницах (Источники/Журналы); подключайте реальный API из @/features/<x>/api."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["scripts/**/*.ts"],
+      "rules": { "no-console": "off" }
+    },
+    {
+      "files": [
+        "src/features/document/pages/OperatorSources.tsx",
+        "src/features/document/pages/OperatorLog.tsx",
+        "src/features/admin/pages/AdminLog.tsx"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["dist/**", "node_modules/**"]
+}

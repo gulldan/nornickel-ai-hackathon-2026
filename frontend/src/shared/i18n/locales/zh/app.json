@@ -1,0 +1,26 @@
+{
+  "brand": "假设工厂",
+  "subtitle": {
+    "user": "知识库",
+    "operator": "语料管理",
+    "admin": "平台与指标"
+  },
+  "groups": {
+    "work": "工作",
+    "corpus": "知识库",
+    "admin": "管理"
+  },
+  "nav": {
+    "search": "搜索",
+    "hypotheses": "假设",
+    "topics": "文档主题",
+    "goals": "目标",
+    "history": "历史",
+    "documents": "文档",
+    "overview": "概览",
+    "metrics": "指标",
+    "users": "用户",
+    "settings": "设置"
+  },
+  "language": "界面语言"
+}

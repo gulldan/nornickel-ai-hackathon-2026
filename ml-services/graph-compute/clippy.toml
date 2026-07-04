@@ -1,0 +1,14 @@
+msrv = "1.96.0"
+
+avoid-breaking-exported-api = true
+
+trivial-copy-size-limit = 256
+pass-by-value-size-limit = 256
+
+cognitive-complexity-threshold = 30
+too-many-arguments-threshold = 10
+too-many-lines-threshold = 200
+
+missing-docs-in-crate-items = false
+
+disallowed-names = ["tmp", "temp", "data", "obj", "val", ".."]

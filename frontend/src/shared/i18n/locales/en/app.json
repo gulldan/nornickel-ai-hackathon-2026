@@ -1,0 +1,26 @@
+{
+  "brand": "Hypothesis Factory",
+  "subtitle": {
+    "user": "Knowledge base",
+    "operator": "Corpus curation",
+    "admin": "Stand & metrics"
+  },
+  "groups": {
+    "work": "Work",
+    "corpus": "Knowledge base",
+    "admin": "Administration"
+  },
+  "nav": {
+    "search": "Search",
+    "hypotheses": "Hypotheses",
+    "topics": "Document topics",
+    "goals": "Goals",
+    "history": "History",
+    "documents": "Documents",
+    "overview": "Overview",
+    "metrics": "Metrics",
+    "users": "Users",
+    "settings": "Settings"
+  },
+  "language": "Interface language"
+}

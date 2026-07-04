@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+// Package rag.llm.v1 is llm-service's gRPC contract — grounded answer generation
+// (hybrid retrieval -> rerank -> generate) called by main-service, plus the
+// chunk reader behind the document-preview pane (the indexed chunks ARE the
+// platform's canonical extracted content; originals stay in S3).
+package rag.llm.v1;
+
+import "common/v1/common.proto";
+
+option go_package = "github.com/example/rag-mvp/pkg/genproto/llm/v1;llmv1";
+
+message DocumentChunksRequest {
+  string document_id = 1;
+  // Owner scoping mirrors retrieval: a caller may only read chunks of
+  // documents that belong to the given owner.
+  string owner_id = 2;
+}
+
+message DocumentChunk {
+  string id = 1;    // chunk id (Qdrant point id == OpenSearch _id)
+  int32 index = 2;  // position within the document (chunk_index payload)
+  string text = 3;
+}
+
+message DocumentChunksResponse {
+  repeated DocumentChunk chunks = 1; // ordered by index ascending
+}
+
+service RagService {
+  rpc Answer(.rag.common.v1.RagRequest) returns (.rag.common.v1.RagResponse);
+  rpc DocumentChunks(DocumentChunksRequest) returns (DocumentChunksResponse);
+}

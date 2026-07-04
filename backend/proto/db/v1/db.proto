@@ -1,0 +1,340 @@
+syntax = "proto3";
+
+// Package rag.db.v1 is db-service's gRPC contract — the BFF over PostgreSQL that
+// auth, main-service and the workers call internally.
+package rag.db.v1;
+
+import "common/v1/common.proto";
+
+option go_package = "github.com/example/rag-mvp/pkg/genproto/db/v1;dbv1";
+
+message GetUserByUsernameRequest {
+  string username = 1;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password_hash = 2;
+  repeated string roles = 3;
+}
+
+message ListUsersRequest {}
+
+message ListUsersResponse {
+  // Users with password_hash always empty: the list feeds the admin UI, not
+  // credential verification.
+  repeated rag.common.v1.User users = 1;
+}
+
+message CreateDocumentRequest {
+  string owner_id = 1;
+  string filename = 2;
+  string mime_type = 3;
+  int64 size = 4;
+  string object_key = 5;
+  string content_hash = 6;
+}
+
+message GetDocumentRequest {
+  string id = 1;
+}
+
+message FindDocumentByHashRequest {
+  string content_hash = 1;
+  string owner_id = 2; // dedup is owner-scoped: never link one tenant's upload to another's document
+}
+
+message ListDocumentsRequest {
+  string owner_id = 1;
+}
+
+message ListDocumentsResponse {
+  repeated rag.common.v1.Document documents = 1;
+}
+
+message UpdateDocumentStatusRequest {
+  string id = 1;
+  string status = 2;
+  string message = 3;
+  optional int32 chunk_count = 4;
+}
+
+message UpdateDocumentStatusResponse {}
+
+// SetDocumentTitle records the real article title extracted from the document's
+// text during indexing (and by the one-shot backfill). Separate from status so
+// it can be set independently of the ingestion state machine.
+message SetDocumentTitleRequest {
+  string id = 1;
+  string title = 2;
+}
+
+message SetDocumentTitleResponse {}
+
+// SetDocumentMeta записывает метаданные документа, извлечённые парсером
+// (email-заголовки, PDF docinfo); отдельно от статуса, как и SetDocumentTitle.
+message SetDocumentMetaRequest {
+  string id = 1;
+  string author = 2;
+  string published_at = 3;
+  string source_ref = 4;
+}
+
+message SetDocumentMetaResponse {}
+
+// SetDocumentKind записывает класс документа, определённый при индексации
+// ("hypotheses" — готовые гипотезы/мозговой штурм); reindex перезаписывает
+// значение, так что классификация всегда отражает последний прогон.
+message SetDocumentKindRequest {
+  string id = 1;
+  string kind = 2;
+}
+
+message SetDocumentKindResponse {}
+
+message CreateChatRequest {
+  string owner_id = 1;
+  string title = 2;
+  // Page the conversation started from ("search"); optional.
+  string source = 3;
+}
+
+message GetChatRequest {
+  string id = 1;
+}
+
+message ListChatsRequest {
+  string owner_id = 1;
+  // Pagination window; limit <= 0 returns the full list (legacy behaviour).
+  int32 limit = 2;
+  int32 offset = 3;
+  // Admin history view: all owners' chats; owner_id is ignored then.
+  bool all_owners = 4;
+}
+
+message ListChatsResponse {
+  repeated rag.common.v1.Chat chats = 1;
+  // Total rows matching the scope (before limit/offset) — for pagination.
+  int64 total = 2;
+}
+
+message AddMessageRequest {
+  string chat_id = 1;
+  string role = 2;
+  string content = 3;
+  repeated rag.common.v1.Source sources = 4;
+  // Raw-JSON answer provenance ({model, cached, trace}); "" for user messages.
+  string meta = 5;
+}
+
+message ListMessagesRequest {
+  string chat_id = 1;
+}
+
+message ListMessagesResponse {
+  repeated rag.common.v1.Message messages = 1;
+}
+
+message ListModelsRequest {}
+
+message ListModelsResponse {
+  repeated rag.common.v1.Model models = 1;
+}
+
+// ---- Hypothesis Factory ----
+// Create* requests carry content only: db-service assigns ids, revision numbers
+// and timestamps (any sent in the embedded message are ignored), mirroring
+// CreateDocument above.
+
+message CreateKPIRequest {
+  string owner_id = 1;
+  string title = 2;
+  string description = 3;
+  string metric = 4;
+  string unit = 5;
+  string direction = 6;
+  optional double baseline = 7;
+  optional double target = 8;
+  string function_area = 9;
+  string detail = 10; // raw JSON
+}
+message GetKPIRequest { string id = 1; }
+message ListKPIsRequest { string owner_id = 1; }
+message ListKPIsResponse { repeated rag.common.v1.KPI kpis = 1; }
+message UpdateKPIRequest { rag.common.v1.KPI kpi = 1; }
+message UpdateKPIResponse {}
+message DeleteKPIRequest { string id = 1; }
+message DeleteKPIResponse {}
+
+message AttachKpiDocumentRequest {
+  string kpi_id = 1;
+  string document_id = 2;
+  string role = 3; // input | reference
+}
+message AttachKpiDocumentResponse {}
+message ListKpiDocumentsRequest { string kpi_id = 1; }
+message KpiDocumentLink {
+  rag.common.v1.Document document = 1;
+  string role = 2;
+  string attached_at = 3; // RFC3339
+}
+message ListKpiDocumentsResponse { repeated KpiDocumentLink links = 1; }
+message DetachKpiDocumentRequest {
+  string kpi_id = 1;
+  string document_id = 2;
+}
+message DetachKpiDocumentResponse {}
+
+message CreateClusterRequest {
+  string owner_id = 1;
+  string label = 2;
+  string summary = 3;
+  repeated string keywords = 4;
+  string method = 5;
+  int32 chunk_count = 6;
+  int32 document_count = 7;
+  string representatives = 8; // raw JSON
+  string params = 9;          // raw JSON
+}
+message GetClusterRequest { string id = 1; }
+message ListClustersRequest { string owner_id = 1; }
+message ListClustersResponse { repeated rag.common.v1.Cluster clusters = 1; }
+message UpdateClusterRequest { rag.common.v1.Cluster cluster = 1; }
+message UpdateClusterResponse {}
+message DeleteClustersRequest { string owner_id = 1; }
+message DeleteClustersResponse { int64 deleted = 1; }
+
+message CreateHypothesisRequest {
+  // Content of the hypothesis incl. evidence; ids/timestamps are server-assigned.
+  rag.common.v1.Hypothesis hypothesis = 1;
+  // Optional initial audit revision (e.g. action="created").
+  rag.common.v1.HypothesisRevision initial = 2;
+}
+message GetHypothesisRequest { string id = 1; }
+message ListHypothesesRequest {
+  string owner_id = 1;
+  string status = 2;
+  string kpi_id = 3;
+  string cluster_id = 4;
+  string function_area = 5;
+  string source_type = 6;
+  string organization = 7;
+  int32 min_trl = 8;
+  int32 max_trl = 9;
+  repeated string tags = 10; // matches hypotheses carrying ALL listed tags
+  string order_by = 11;      // composite_score | created_at | trl | novelty | value
+  int32 limit = 12;
+  int32 offset = 13;
+  repeated string document_ids = 14; // matches hypotheses with evidence from ANY listed document
+}
+message ListHypothesesResponse { repeated rag.common.v1.Hypothesis hypotheses = 1; }
+message UpdateHypothesisRequest {
+  rag.common.v1.Hypothesis hypothesis = 1;
+  // Optional audit revision describing the change.
+  rag.common.v1.HypothesisRevision revision = 2;
+}
+message UpdateHypothesisResponse {}
+message AddHypothesisRevisionRequest { rag.common.v1.HypothesisRevision revision = 1; }
+message ListHypothesisRevisionsRequest { string hypothesis_id = 1; }
+message ListHypothesisRevisionsResponse { repeated rag.common.v1.HypothesisRevision revisions = 1; }
+message ListHypothesisEvidenceRequest { string hypothesis_id = 1; }
+message ListHypothesisEvidenceResponse { repeated rag.common.v1.HypothesisEvidence evidence = 1; }
+
+// LLM usage ledger row: one per (day, model, operation). day is "YYYY-MM-DD";
+// cost is nano-USD (int, exact — 0 on :free).
+message LLMUsageDailyRow {
+  string day = 1;
+  string model = 2;
+  string operation = 3;
+  int64 requests = 4;
+  int64 prompt_tokens = 5;
+  int64 completion_tokens = 6;
+  int64 cost_nano_usd = 7;
+}
+// Global runtime setting override: key mirrors an env var name; a stored row
+// overrides that env var without redeploy.
+message AppSetting {
+  string key = 1;
+  string value = 2;
+}
+message ListAppSettingsRequest {}
+message ListAppSettingsResponse { repeated AppSetting settings = 1; }
+message SetAppSettingRequest { AppSetting setting = 1; }
+message SetAppSettingResponse {}
+message DeleteAppSettingRequest { string key = 1; }
+message DeleteAppSettingResponse {}
+
+message SetLLMUsageDailyRequest { LLMUsageDailyRow row = 1; }
+message SetLLMUsageDailyResponse {}
+message ListLLMUsageDailyRequest {
+  string from_day = 1;
+  string to_day = 2;
+}
+message ListLLMUsageDailyResponse { repeated LLMUsageDailyRow rows = 1; }
+
+// DbService is the only owner of PostgreSQL. NotFound is reported via the
+// standard gRPC codes.NotFound status.
+service DbService {
+  rpc GetUserByUsername(GetUserByUsernameRequest) returns (rag.common.v1.User);
+  rpc CreateUser(CreateUserRequest) returns (rag.common.v1.User);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+
+  rpc CreateDocument(CreateDocumentRequest) returns (rag.common.v1.Document);
+  rpc GetDocument(GetDocumentRequest) returns (rag.common.v1.Document);
+  // FindDocumentByHash returns the newest non-failed document with the given
+  // content hash, or NotFound — the lookup behind deduplication.
+  rpc FindDocumentByHash(FindDocumentByHashRequest) returns (rag.common.v1.Document);
+  rpc ListDocuments(ListDocumentsRequest) returns (ListDocumentsResponse);
+  rpc UpdateDocumentStatus(UpdateDocumentStatusRequest) returns (UpdateDocumentStatusResponse);
+  rpc SetDocumentTitle(SetDocumentTitleRequest) returns (SetDocumentTitleResponse);
+  rpc SetDocumentMeta(SetDocumentMetaRequest) returns (SetDocumentMetaResponse);
+  rpc SetDocumentKind(SetDocumentKindRequest) returns (SetDocumentKindResponse);
+
+  rpc CreateChat(CreateChatRequest) returns (rag.common.v1.Chat);
+  rpc GetChat(GetChatRequest) returns (rag.common.v1.Chat);
+  rpc ListChats(ListChatsRequest) returns (ListChatsResponse);
+  rpc AddMessage(AddMessageRequest) returns (rag.common.v1.Message);
+  rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse);
+
+  rpc ListModels(ListModelsRequest) returns (ListModelsResponse);
+
+  // Hypothesis Factory.
+  rpc CreateKPI(CreateKPIRequest) returns (rag.common.v1.KPI);
+  rpc GetKPI(GetKPIRequest) returns (rag.common.v1.KPI);
+  rpc ListKPIs(ListKPIsRequest) returns (ListKPIsResponse);
+  rpc UpdateKPI(UpdateKPIRequest) returns (UpdateKPIResponse);
+  // DeleteKPI removes a goal; linked hypotheses survive with kpi_id nulled
+  // (FK ON DELETE SET NULL).
+  rpc DeleteKPI(DeleteKPIRequest) returns (DeleteKPIResponse);
+  // Goal input documents: many-to-many link between a KPI and uploaded
+  // documents that describe the plant's own data for that goal.
+  rpc AttachKpiDocument(AttachKpiDocumentRequest) returns (AttachKpiDocumentResponse);
+  rpc ListKpiDocuments(ListKpiDocumentsRequest) returns (ListKpiDocumentsResponse);
+  rpc DetachKpiDocument(DetachKpiDocumentRequest) returns (DetachKpiDocumentResponse);
+
+  rpc CreateCluster(CreateClusterRequest) returns (rag.common.v1.Cluster);
+  rpc GetCluster(GetClusterRequest) returns (rag.common.v1.Cluster);
+  rpc ListClusters(ListClustersRequest) returns (ListClustersResponse);
+  rpc UpdateCluster(UpdateClusterRequest) returns (UpdateClusterResponse);
+  // DeleteClusters removes all of an owner's clusters (auto-reclustering replaces
+  // the board: delete-all then re-create). Hypotheses are kept (FK SET NULL).
+  rpc DeleteClusters(DeleteClustersRequest) returns (DeleteClustersResponse);
+
+  rpc CreateHypothesis(CreateHypothesisRequest) returns (rag.common.v1.Hypothesis);
+  rpc GetHypothesis(GetHypothesisRequest) returns (rag.common.v1.Hypothesis);
+  rpc ListHypotheses(ListHypothesesRequest) returns (ListHypothesesResponse);
+  rpc UpdateHypothesis(UpdateHypothesisRequest) returns (UpdateHypothesisResponse);
+  rpc AddHypothesisRevision(AddHypothesisRevisionRequest) returns (rag.common.v1.HypothesisRevision);
+  rpc ListHypothesisRevisions(ListHypothesisRevisionsRequest) returns (ListHypothesisRevisionsResponse);
+  rpc ListHypothesisEvidence(ListHypothesisEvidenceRequest) returns (ListHypothesisEvidenceResponse);
+
+  // LLM/OpenRouter usage ledger (Metrics dashboard). SetLLMUsageDaily mirrors a
+  // running daily total (SET semantics); ListLLMUsageDaily reads a date range.
+  rpc SetLLMUsageDaily(SetLLMUsageDailyRequest) returns (SetLLMUsageDailyResponse);
+  rpc ListLLMUsageDaily(ListLLMUsageDailyRequest) returns (ListLLMUsageDailyResponse);
+
+  // Global runtime overrides for env-style settings (admin "Параметры системы").
+  rpc ListAppSettings(ListAppSettingsRequest) returns (ListAppSettingsResponse);
+  rpc SetAppSetting(SetAppSettingRequest) returns (SetAppSettingResponse);
+  rpc DeleteAppSetting(DeleteAppSettingRequest) returns (DeleteAppSettingResponse);
+}

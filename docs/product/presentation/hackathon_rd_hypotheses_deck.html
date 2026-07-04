@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <title>Норникель AI Science Hack — презентация для хакатона</title>
+  <style>
+    :root {
+      --ink: #0f172a;
+      --body: #263244;
+      --muted: #64748b;
+      --line: #dbe3ef;
+      --paper: #ffffff;
+      --canvas: #f6f8fb;
+      --primary: #4338ca;
+      --cyan: #0891b2;
+      --hack-green: #00e7b7;
+      --pad-x: 112px;
+      --pad-y: 88px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      overflow: hidden;
+      background: #000;
+      color: var(--body);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .stage {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .deck-shell {
+      position: relative;
+      width: min(100vw, calc(100vh * 16 / 9));
+      height: min(100vh, calc(100vw * 9 / 16));
+      overflow: hidden;
+      background: var(--canvas);
+    }
+
+    .deck {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--canvas);
+      transform-origin: top left;
+    }
+
+    html.js-ready .deck {
+      width: 1920px;
+      height: 1080px;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      align-content: start;
+      justify-items: start;
+      padding: var(--pad-y) var(--pad-x);
+      overflow: hidden;
+      background: var(--canvas);
+      opacity: 0;
+      pointer-events: none;
+      text-align: left;
+      visibility: hidden;
+    }
+
+    .slide[data-active] {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+
+    .slide::before {
+      content: attr(data-label);
+      position: absolute;
+      top: 32px;
+      left: var(--pad-x);
+      z-index: 2;
+      padding: 9px 14px 10px;
+      border: 1px solid rgba(67, 56, 202, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--primary);
+      font-size: 18px;
+      font-weight: 760;
+      line-height: 1;
+      letter-spacing: 0;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .slide:nth-child(1) {
+      align-content: center;
+      justify-items: center;
+      place-items: center;
+      text-align: center;
+    }
+
+    .title-hackathon-logo {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      color: var(--primary);
+      font-size: 64px;
+      font-weight: 950;
+      line-height: 0.92;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .title-hackathon-logo span:first-child {
+      color: var(--hack-green);
+    }
+
+    .slide-team {
+      grid-template-rows: auto 1fr;
+      row-gap: 0;
+    }
+
+    .slide-team h1 {
+      max-width: 1500px;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 36px;
+      width: 100%;
+      align-self: center;
+    }
+
+    .profile-card {
+      min-height: 470px;
+      padding: 42px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .profile-photo {
+      width: 174px;
+      height: 174px;
+      margin-bottom: 34px;
+    }
+
+    .profile-photo svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .profile-card h2 {
+      margin: 0 0 18px;
+      color: var(--ink);
+      font-size: 44px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .profile-card p {
+      max-width: 390px;
+      margin: 0;
+      color: var(--body);
+      font-size: 25px;
+      font-weight: 620;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .profile-card a {
+      color: var(--primary);
+      font-weight: 860;
+      text-decoration: none;
+    }
+
+    .profile-card .profile-grade {
+      margin: -6px 0 22px;
+      color: var(--primary);
+      font-size: 22px;
+      font-weight: 860;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .profile-card-roman {
+      order: 1;
+    }
+
+    .profile-card-maxim {
+      order: 2;
+    }
+
+    .profile-card-rustam {
+      order: 3;
+    }
+
+    .slide-problem {
+      grid-template-rows: auto 1fr;
+      row-gap: 0;
+    }
+
+    .slide-problem h1 {
+      max-width: 1540px;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+      width: 100%;
+      align-self: center;
+    }
+
+    .problem-card {
+      min-height: 418px;
+      padding: 34px 30px 32px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .problem-metric {
+      margin-bottom: 28px;
+      color: var(--primary);
+      font-size: 68px;
+      font-weight: 950;
+      line-height: 0.92;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .problem-card:nth-child(2) .problem-metric {
+      color: var(--cyan);
+    }
+
+    .problem-card:nth-child(3) .problem-metric {
+      color: var(--hack-green);
+    }
+
+    .problem-card h2 {
+      margin: 0 0 16px;
+      color: var(--ink);
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .problem-card p {
+      margin: 0;
+      color: var(--body);
+      font-size: 21px;
+      font-weight: 620;
+      line-height: 1.27;
+      letter-spacing: 0;
+    }
+
+    .slide-screenshots {
+      display: block;
+    }
+
+    .slide-screenshots h1 {
+      max-width: 860px;
+    }
+
+    .slide-solution h1 {
+      max-width: 760px;
+    }
+
+    .slide-solution .screenshots-layout {
+      position: absolute;
+      inset: 0;
+    }
+
+    .solution-screenshots-row {
+      position: absolute;
+      top: 136px;
+      right: var(--pad-x);
+      width: 850px;
+    }
+
+    .slide-solution .screenshot-frame {
+      aspect-ratio: 1920 / 907;
+    }
+
+    .solution-subtitle strong {
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    .slide-solution .solution-subtitle {
+      position: absolute;
+      top: 612px;
+      right: var(--pad-x);
+      left: var(--pad-x);
+      max-width: 1580px;
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.22;
+    }
+
+    .screenshots-layout {
+      position: absolute;
+      inset: 0;
+    }
+
+    .screenshot-card {
+      margin: 0;
+    }
+
+    .screenshot-card-search {
+      position: absolute;
+      left: var(--pad-x);
+      bottom: 64px;
+      width: 860px;
+    }
+
+    .screenshot-feature {
+      position: absolute;
+      top: 112px;
+      left: 1044px;
+      width: 820px;
+    }
+
+    .screenshot-frame {
+      aspect-ratio: 3024 / 1596;
+      overflow: hidden;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .screenshot-frame img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: left top;
+    }
+
+    .screenshot-subtitle {
+      margin: 28px 0 0;
+      color: var(--body);
+      font-size: 30px;
+      font-weight: 680;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+
+    .slide-hypothesis-extraction h1 {
+      max-width: 860px;
+    }
+
+    .slide-hypothesis-extraction .screenshot-card-search {
+      top: 552px;
+      bottom: auto;
+      width: 900px;
+    }
+
+    .slide-hypothesis-extraction .screenshot-feature {
+      top: 144px;
+      width: 860px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .slide-fullscreen-screenshot {
+      display: block;
+      padding: 0;
+      background: var(--canvas);
+    }
+
+    .slide-fullscreen-screenshot img {
+      position: absolute;
+      top: var(--pad-y);
+      left: var(--pad-x);
+      width: calc(100% - var(--pad-x) - var(--pad-x));
+      max-height: calc(100% - var(--pad-y) - 56px);
+      display: block;
+      object-fit: contain;
+      object-position: left top;
+    }
+
+    .hypothesis-extraction-frame {
+      aspect-ratio: 1915 / 908;
+    }
+
+    .hypothesis-extraction-frame img {
+      object-fit: cover;
+      object-position: left top;
+    }
+
+    .hypothesis-extraction-subtitle {
+      max-width: 860px;
+    }
+
+    .hypothesis-extraction-subtitle strong {
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    .slide-rag-evidence {
+      display: block;
+    }
+
+    .slide-rag-evidence::after {
+      content: "";
+      position: absolute;
+      top: 104px;
+      left: 960px;
+      width: 1px;
+      height: 872px;
+      background: rgba(15, 23, 42, 0.1);
+    }
+
+    .rag-left {
+      position: absolute;
+      top: var(--pad-y);
+      left: var(--pad-x);
+      width: 792px;
+    }
+
+    .rag-right {
+      position: absolute;
+      top: 148px;
+      left: 1004px;
+      width: 804px;
+    }
+
+    .slide-rag-evidence h1 {
+      max-width: 820px;
+      font-size: 64px;
+      line-height: 1.04;
+    }
+
+    .rag-subtitle {
+      margin: 26px 0 0;
+      color: var(--body);
+      font-size: 28px;
+      font-weight: 680;
+      line-height: 1.24;
+      letter-spacing: 0;
+    }
+
+    .rag-subtitle strong {
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    .rag-source-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+      margin-top: 34px;
+    }
+
+    .rag-source-card {
+      min-height: 182px;
+      padding: 30px 30px 28px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .rag-source-card strong {
+      display: block;
+      margin-bottom: 15px;
+      color: var(--primary);
+      font-size: 38px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .rag-source-card:nth-child(2) strong {
+      color: var(--cyan);
+    }
+
+    .rag-source-card:nth-child(3) strong {
+      color: var(--hack-green);
+    }
+
+    .rag-source-card span {
+      display: block;
+      color: var(--ink);
+      font-size: 22px;
+      font-weight: 820;
+      line-height: 1.14;
+      letter-spacing: 0;
+    }
+
+    .rag-shot {
+      width: 100%;
+      margin: 0;
+    }
+
+    .rag-shot-frame {
+      aspect-ratio: 1920 / 907;
+      overflow: hidden;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .rag-shot-frame img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: left top;
+    }
+
+    .slide-export {
+      display: block;
+    }
+
+    .slide-export::after {
+      content: "";
+      position: absolute;
+      top: 104px;
+      left: 960px;
+      width: 1px;
+      height: 872px;
+      background: rgba(15, 23, 42, 0.1);
+    }
+
+    .export-left {
+      position: absolute;
+      top: var(--pad-y);
+      left: var(--pad-x);
+      width: 808px;
+    }
+
+    .slide-export h1 {
+      max-width: 808px;
+    }
+
+    .export-format-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 38px;
+    }
+
+    .export-format-card {
+      min-height: 128px;
+      padding: 24px 24px 22px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .export-format-card strong {
+      display: block;
+      margin: 0 0 10px;
+      color: var(--primary);
+      font-size: 32px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .export-format-card:nth-child(2) strong,
+    .export-format-card:nth-child(6) strong {
+      color: var(--cyan);
+    }
+
+    .export-format-card:nth-child(4) strong {
+      color: var(--hack-green);
+    }
+
+    .export-format-card span {
+      display: block;
+      color: var(--ink);
+      font-size: 19px;
+      font-weight: 820;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .export-right {
+      position: absolute;
+      top: 128px;
+      left: 1086px;
+      width: 606px;
+      height: 852px;
+    }
+
+    .export-report-frame {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .export-report-frame img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: center top;
+    }
+
+    .slide-ingest {
+      grid-template-rows: auto 1fr;
+      row-gap: 0;
+    }
+
+    .slide-ingest h1 {
+      max-width: 1660px;
+    }
+
+    .ingest-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 36px;
+      width: 100%;
+      align-self: center;
+      align-items: stretch;
+    }
+
+    .ingest-panel {
+      min-height: 470px;
+      padding: 32px 34px 34px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .ingest-eyebrow {
+      margin: 0 0 20px;
+      color: var(--primary);
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .ingest-panel h2 {
+      margin: 0 0 24px;
+      color: var(--ink);
+      font-size: 38px;
+      font-weight: 930;
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .ingest-format-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .ingest-format-card {
+      min-height: 108px;
+      padding: 24px 20px 20px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .ingest-format-code {
+      margin: 0 0 12px;
+      color: var(--primary);
+      font-size: 34px;
+      font-weight: 950;
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .ingest-format-card:nth-child(2) .ingest-format-code,
+    .ingest-format-card:nth-child(4) .ingest-format-code {
+      color: var(--cyan);
+    }
+
+    .ingest-format-card:nth-child(3) .ingest-format-code {
+      color: var(--hack-green);
+    }
+
+    .ingest-format-card h3 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .ingest-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      align-content: center;
+    }
+
+    .ingest-metric {
+      min-height: 142px;
+      padding: 22px 24px 20px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .ingest-metric em {
+      display: block;
+      margin: 0 0 12px;
+      color: var(--body);
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .ingest-metric strong {
+      display: block;
+      margin: 0 0 10px;
+      color: var(--primary);
+      font-size: 52px;
+      font-weight: 950;
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .ingest-metric:nth-child(3) strong,
+    .ingest-metric:nth-child(5) strong {
+      color: var(--cyan);
+    }
+
+    .ingest-metric span {
+      display: block;
+      color: var(--ink);
+      font-size: 21px;
+      font-weight: 850;
+      line-height: 1.14;
+      letter-spacing: 0;
+    }
+
+    .slide-evaluation {
+      grid-template-rows: auto 1fr;
+      row-gap: 0;
+    }
+
+    .slide-evaluation h1 {
+      max-width: 1540px;
+    }
+
+    .evaluation-layout {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 28px;
+      margin-top: 32px;
+      width: 100%;
+      align-self: center;
+      align-items: start;
+    }
+
+    .evaluation-card {
+      padding: 30px 28px 28px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .evaluation-eyebrow {
+      margin: 0 0 16px;
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .evaluation-card h2 {
+      margin: 0 0 24px;
+      color: var(--ink);
+      font-size: 32px;
+      font-weight: 930;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .evaluation-factor-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .evaluation-factor-row {
+      display: grid;
+      grid-template-columns: 48px 1fr 58px;
+      gap: 12px;
+      min-height: 64px;
+      padding: 14px 18px 13px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.54);
+      align-items: center;
+    }
+
+    .evaluation-factor-row em {
+      color: var(--primary);
+      font-size: 28px;
+      font-style: normal;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .evaluation-factor-row span {
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 880;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .evaluation-factor-row strong {
+      color: var(--body);
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .evaluation-passport-grid {
+      display: grid;
+      gap: 0;
+      margin-top: 2px;
+    }
+
+    .evaluation-passport-item {
+      display: grid;
+      grid-template-columns: 146px 1fr;
+      gap: 14px;
+      padding: 14px 0;
+      border-top: 1px solid rgba(15, 23, 42, 0.1);
+    }
+
+    .evaluation-passport-item strong {
+      color: var(--primary);
+      font-size: 17px;
+      font-weight: 930;
+      line-height: 1.05;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .evaluation-passport-item span {
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 780;
+      line-height: 1.13;
+      letter-spacing: 0;
+    }
+
+    .slide-bridge-generation {
+      grid-template-rows: auto 1fr;
+      row-gap: 0;
+    }
+
+    .slide-bridge-generation h1 {
+      max-width: 1540px;
+    }
+
+    .bridge-layout {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 42px;
+      width: 100%;
+      align-self: center;
+      align-items: center;
+    }
+
+    .bridge-map {
+      min-height: 560px;
+      padding: 34px 34px 32px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .bridge-eyebrow {
+      margin: 0 0 22px;
+      color: var(--primary);
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .bridge-svg {
+      width: 100%;
+      height: 330px;
+      display: block;
+      overflow: visible;
+    }
+
+    .bridge-map p {
+      margin: 28px 0 0;
+      color: var(--body);
+      font-size: 25px;
+      font-weight: 680;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+
+    .bridge-map strong {
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .bridge-step-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .bridge-step {
+      min-height: 260px;
+      padding: 28px 28px 26px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .bridge-step-num {
+      margin: 0 0 18px;
+      color: var(--primary);
+      font-size: 52px;
+      font-weight: 950;
+      line-height: 0.92;
+      letter-spacing: 0;
+    }
+
+    .bridge-step:nth-child(2) .bridge-step-num,
+    .bridge-step:nth-child(4) .bridge-step-num {
+      color: var(--cyan);
+    }
+
+    .bridge-step:nth-child(3) .bridge-step-num {
+      color: var(--hack-green);
+    }
+
+    .bridge-step h2 {
+      margin: 0 0 14px;
+      color: var(--ink);
+      font-size: 30px;
+      font-weight: 930;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .bridge-step p {
+      margin: 0;
+      color: var(--body);
+      font-size: 21px;
+      font-weight: 650;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+
+    .bridge-step code {
+      color: var(--primary);
+      font-family: inherit;
+      font-weight: 900;
+    }
+
+    h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 1580px;
+      margin: 0;
+      color: var(--ink);
+      font-size: 72px;
+      font-weight: 930;
+      line-height: 1.05;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .slide:nth-child(1) h1 {
+      display: grid;
+      justify-items: center;
+      gap: 28px;
+      max-width: 1300px;
+      font-size: 92px;
+      font-weight: 950;
+      line-height: 1.04;
+    }
+
+    .title-cross {
+      color: var(--primary);
+      font-size: 64px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .slide-cybersecurity {
+      grid-template-rows: auto 1fr;
+      row-gap: 0;
+    }
+
+    .slide-cybersecurity h1 {
+      max-width: 1520px;
+    }
+
+    .cybersecurity-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+      width: 100%;
+      align-self: center;
+    }
+
+    .cybersecurity-card {
+      min-height: 420px;
+      padding: 34px 30px 32px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .cybersecurity-label {
+      margin: 0 0 26px;
+      color: var(--primary);
+      font-size: 56px;
+      font-weight: 950;
+      line-height: 0.92;
+      letter-spacing: 0;
+    }
+
+    .cybersecurity-card:nth-child(2) .cybersecurity-label {
+      color: var(--cyan);
+    }
+
+    .cybersecurity-card:nth-child(3) .cybersecurity-label {
+      color: var(--hack-green);
+    }
+
+    .cybersecurity-card h2 {
+      margin: 0 0 16px;
+      color: var(--ink);
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .cybersecurity-card p {
+      margin: 0;
+      color: var(--body);
+      font-size: 21px;
+      font-weight: 620;
+      line-height: 1.27;
+      letter-spacing: 0;
+    }
+
+    .slide-roadmap {
+      grid-template-rows: auto 1fr;
+      row-gap: 0;
+    }
+
+    .slide-roadmap h1 {
+      max-width: 1560px;
+    }
+
+    .roadmap-layout {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+      width: 100%;
+      align-self: center;
+      position: relative;
+    }
+
+    .roadmap-layout::before {
+      content: "";
+      position: absolute;
+      top: 84px;
+      left: 7%;
+      right: 7%;
+      height: 3px;
+      background: rgba(67, 56, 202, 0.18);
+    }
+
+    .roadmap-card {
+      position: relative;
+      min-height: 520px;
+      padding: 34px 30px 32px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .roadmap-step {
+      display: grid;
+      place-items: center;
+      width: 104px;
+      height: 104px;
+      margin: 0 0 34px;
+      border: 3px solid rgba(67, 56, 202, 0.22);
+      border-radius: 50%;
+      background: var(--canvas);
+      color: var(--primary);
+      font-size: 42px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .roadmap-card:nth-child(2) .roadmap-step,
+    .roadmap-card:nth-child(4) .roadmap-step {
+      color: var(--cyan);
+      border-color: rgba(8, 145, 178, 0.22);
+    }
+
+    .roadmap-card:nth-child(3) .roadmap-step {
+      color: var(--hack-green);
+      border-color: rgba(0, 231, 183, 0.24);
+    }
+
+    .roadmap-phase {
+      margin: 0 0 18px;
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .roadmap-card h2 {
+      margin: 0 0 16px;
+      color: var(--ink);
+      font-size: 31px;
+      font-weight: 930;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .roadmap-card p {
+      margin: 0;
+      color: var(--body);
+      font-size: 21px;
+      font-weight: 650;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .slide-integration {
+      display: block;
+    }
+
+    .slide-integration h1 {
+      max-width: 1680px;
+    }
+
+    .integration-nornickel {
+      color: var(--hack-green);
+    }
+
+    .integration-scid {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .integration-sign {
+      color: var(--ink);
+    }
+
+    .integration-body {
+      position: absolute;
+      top: 392px;
+      bottom: 128px;
+      left: var(--pad-x);
+      right: var(--pad-x);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 92px;
+      align-items: center;
+    }
+
+    .integration-copy {
+      max-width: 1140px;
+      align-self: center;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .integration-copy p {
+      margin: 0;
+      color: var(--body);
+      font-size: 36px;
+      font-weight: 680;
+      line-height: 1.23;
+      letter-spacing: 0;
+    }
+
+    .integration-copy p + p {
+      margin-top: 26px;
+    }
+
+    .integration-copy strong {
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    .integration-contact {
+      justify-self: start;
+      align-self: center;
+      grid-column: 2;
+      grid-row: 1;
+      width: 420px;
+      padding: 30px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+      text-align: center;
+    }
+
+    .integration-qr-box {
+      width: 330px;
+      height: 330px;
+      margin: 0 auto;
+      padding: 16px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--primary);
+    }
+
+    .integration-qr-svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      shape-rendering: crispEdges;
+    }
+
+    .integration-contact a {
+      display: block;
+      margin-top: 24px;
+      color: var(--primary);
+      font-size: 44px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: 0;
+      text-decoration: none;
+    }
+
+    .integration-contact span {
+      display: block;
+      margin-top: 12px;
+      color: var(--body);
+      font-size: 22px;
+      font-weight: 740;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .slide-thanks {
+      align-content: center;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .slide-thanks h1 {
+      max-width: 1320px;
+      color: var(--primary);
+      font-size: 104px;
+      font-weight: 950;
+      line-height: 1.02;
+    }
+
+    .thanks-team {
+      display: block;
+      margin-top: 44px;
+      color: var(--ink);
+      font-size: 86px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .thanks-prefix {
+      display: block;
+      margin-bottom: 18px;
+      color: var(--hack-green);
+      font-size: 58px;
+      font-weight: 930;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .slide-metrics {
+      grid-template-rows: auto 1fr;
+      row-gap: 0;
+    }
+
+    .slide-metrics h1 {
+      max-width: 1660px;
+      font-size: 64px;
+      line-height: 1.05;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      width: 100%;
+      align-self: center;
+    }
+
+    .metrics-table-card {
+      min-height: 292px;
+      padding: 24px 24px 22px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .metrics-table-card h2 {
+      margin: 0 0 16px;
+      color: var(--primary);
+      font-size: 28px;
+      font-weight: 930;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .metrics-table-card:nth-child(2) h2,
+    .metrics-table-card:nth-child(5) h2 {
+      color: var(--cyan);
+    }
+
+    .metrics-table-card:nth-child(3) h2,
+    .metrics-table-card:nth-child(6) h2 {
+      color: var(--hack-green);
+    }
+
+    .metrics-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .metrics-table td {
+      padding: 8px 0 9px;
+      border-top: 1px solid rgba(15, 23, 42, 0.1);
+      color: var(--body);
+      font-size: 18px;
+      font-weight: 680;
+      line-height: 1.16;
+      letter-spacing: 0;
+      vertical-align: top;
+    }
+
+    .metrics-table td:first-child {
+      width: 45%;
+      padding-right: 16px;
+      color: var(--ink);
+      font-weight: 860;
+    }
+
+    .metrics-table strong {
+      color: var(--ink);
+      font-weight: 930;
+      white-space: nowrap;
+    }
+
+    .metrics-footnote {
+      margin-top: 14px;
+      color: var(--body);
+      font-size: 15px;
+      font-weight: 650;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .metrics-footnote strong {
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    @media print {
+      @page {
+        size: 1920px 1080px;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .stage {
+        position: static;
+        display: block;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .deck-shell {
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .deck {
+        position: static;
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        transform: none !important;
+      }
+
+      .slide {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        page-break-after: always;
+        break-after: page;
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="deck-shell" id="deckShell">
+      <main class="deck" id="deck" aria-live="polite">
+        <section class="slide" data-label="Фабрика гипотез" data-active><h1><span>Квадрицепс</span><span class="title-cross">×</span><span class="title-hackathon-logo" aria-label="Норникель AI Science Hack"><span>Норникель</span><span>AI Science Hack</span></span></h1></section>
+        <section class="slide slide-team" data-label="Команда">
+          <h1>13 лет суммарного опыта в Data Science и 10+ хакатонов за плечами</h1>
+          <div class="team-grid" aria-label="Участники команды">
+            <article class="profile-card profile-card-roman">
+              <div class="profile-photo" aria-hidden="true">
+                <svg viewBox="0 0 174 174" role="img">
+                  <rect width="174" height="174" rx="8" fill="#eef2ff"/>
+                  <circle cx="87" cy="74" r="36" fill="#4338ca"/>
+                  <path d="M38 151c7-31 26-48 49-48s42 17 49 48" fill="#0f172a"/>
+                  <circle cx="75" cy="70" r="5" fill="#f6f8fb"/>
+                  <circle cx="99" cy="70" r="5" fill="#f6f8fb"/>
+                  <path d="M72 88c10 8 20 8 30 0" fill="none" stroke="#f6f8fb" stroke-width="5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h2>Роман</h2>
+              <p class="profile-grade">Senior · 3 года</p>
+              <p>Head of AI, <a href="https://scid.ai" target="_blank" rel="noopener noreferrer">scid.ai</a>. NLP Engineer в R&amp;D отделе. ML/RAG-архитектура и продуктовый контур.</p>
+            </article>
+            <article class="profile-card profile-card-rustam">
+              <div class="profile-photo" aria-hidden="true">
+                <svg viewBox="0 0 174 174" role="img">
+                  <rect width="174" height="174" rx="8" fill="#ecfeff"/>
+                  <circle cx="87" cy="74" r="36" fill="#0891b2"/>
+                  <path d="M38 151c7-31 26-48 49-48s42 17 49 48" fill="#0f172a"/>
+                  <circle cx="75" cy="70" r="5" fill="#f6f8fb"/>
+                  <circle cx="99" cy="70" r="5" fill="#f6f8fb"/>
+                  <path d="M73 88c9 7 19 7 28 0" fill="none" stroke="#f6f8fb" stroke-width="5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h2>Рустам</h2>
+              <p class="profile-grade">Senior · 3 года</p>
+              <p>CV Engineer в R&amp;D отделе. Computer Vision, Data Science и оценка гипотез по данным.</p>
+            </article>
+            <article class="profile-card profile-card-maxim">
+              <div class="profile-photo" aria-hidden="true">
+                <svg viewBox="0 0 174 174" role="img">
+                  <rect width="174" height="174" rx="8" fill="#f0fdf4"/>
+                  <circle cx="87" cy="74" r="36" fill="#00c89a"/>
+                  <path d="M38 151c7-31 26-48 49-48s42 17 49 48" fill="#0f172a"/>
+                  <circle cx="75" cy="70" r="5" fill="#f6f8fb"/>
+                  <circle cx="99" cy="70" r="5" fill="#f6f8fb"/>
+                  <path d="M72 88c10 8 20 8 30 0" fill="none" stroke="#f6f8fb" stroke-width="5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h2>Максим</h2>
+              <p class="profile-grade">Principal · 7 лет</p>
+              <p>PhD, Principal ML Engineer в R&amp;D отделе. Backend, архитектура, интеграции и стабильность демо.</p>
+            </article>
+          </div>
+        </section>
+        <section class="slide slide-problem" data-label="Проблема">
+          <h1>R&amp;D-гипотезы рождаются медленно, субъективно и без прозрачного приоритета</h1>
+          <div class="problem-grid" aria-label="Метрики проблем старта R&D-проектов">
+            <article class="problem-card">
+              <div class="problem-metric">2–4 нед.</div>
+              <h2>Медленный старт</h2>
+              <p>уходит на формулировку, согласование и первичную проверку исследовательского направления.</p>
+            </article>
+            <article class="problem-card">
+              <div class="problem-metric">Архивы</div>
+              <h2>Не работают</h2>
+              <p>отчёты и результаты экспериментов остаются неструктурированными и не генерируют новые идеи.</p>
+            </article>
+            <article class="problem-card">
+              <div class="problem-metric">1–2</div>
+              <h2>Экспертное узкое место</h2>
+              <p>ключевых эксперта часто определяют повестку вручную, снижая воспроизводимость отбора.</p>
+            </article>
+            <article class="problem-card">
+              <div class="problem-metric">0</div>
+              <h2>Единого скоринга</h2>
+              <p>нет общего формата сравнения по новизне, рискам, ресурсам и ожидаемой бизнес-ценности.</p>
+            </article>
+          </div>
+        </section>
+        <section class="slide slide-screenshots slide-solution" data-label="Решение">
+          <h1>Решение собирает знания, цели и доказательства в поток проверяемых гипотез</h1>
+          <div class="screenshots-layout" aria-label="Скриншот решения">
+            <div class="solution-screenshots-row">
+              <figure class="screenshot-card">
+                <div class="screenshot-frame">
+                  <img src="assets/solution-goals.png" alt="Экран целей в решении Фабрика гипотез">
+                </div>
+              </figure>
+            </div>
+            <p class="screenshot-subtitle solution-subtitle">Технолог вводит <strong>KPI</strong>: например, повысить извлечение меди. Система читает <strong>внутренние отчёты, таблицы, статьи и патенты</strong>. Через десятки секунд выдаёт карточки гипотез: <strong>что проверить</strong>, почему это может сработать, какие источники за и против, какой риск и какой план эксперимента. Эксперт выбирает, правит и запускает проверки.</p>
+          </div>
+        </section>
+        <section class="slide slide-fullscreen-screenshot" data-label="Портфель гипотез">
+          <h1 class="visually-hidden">Портфель гипотез</h1>
+          <img src="assets/solution-hypotheses-fullscreen.png" alt="Полноэкранный экран портфеля гипотез">
+        </section>
+        <section class="slide slide-ingest" data-label="Типы файлов">
+          <h1>Обработка документов строит единый индекс для поиска и генерации гипотез</h1>
+          <div class="ingest-grid" aria-label="Типы файлов, индексация и скорость работы">
+            <article class="ingest-panel">
+              <div class="ingest-eyebrow">Форматы</div>
+              <h2>Единый контур для разнородной базы знаний</h2>
+              <div class="ingest-format-grid">
+                <article class="ingest-format-card">
+                  <div class="ingest-format-code">OCR</div>
+                  <h3>Картинки и схемы</h3>
+                </article>
+                <article class="ingest-format-card">
+                  <div class="ingest-format-code">XLS</div>
+                  <h3>Excel и таблицы</h3>
+                </article>
+                <article class="ingest-format-card">
+                  <div class="ingest-format-code">TXT</div>
+                  <h3>Текстовые файлы</h3>
+                </article>
+                <article class="ingest-format-card">
+                  <div class="ingest-format-code">DOC</div>
+                  <h3>Office и PDF</h3>
+                </article>
+              </div>
+            </article>
+            <div class="ingest-metrics" aria-label="Метрики индексации и скорости">
+              <div class="ingest-metric">
+                <em>Индексация</em>
+                <strong>3,75 с</strong>
+                <span>медианное время на один новый документ</span>
+              </div>
+              <div class="ingest-metric">
+                <em>Распознавание</em>
+                <strong>0,70</strong>
+                <span>качество распознавания на тестовом наборе</span>
+              </div>
+              <div class="ingest-metric">
+                <em>Поиск</em>
+                <strong>0,667</strong>
+                <span>точность источника в первых пяти результатах</span>
+              </div>
+              <div class="ingest-metric">
+                <em>Поиск</em>
+                <strong>3,98 с</strong>
+                <span>задержка поиска в 95% запросов</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="slide slide-screenshots slide-hypothesis-extraction" data-label="Извлечение гипотез">
+          <h1>Извлечение гипотез собирает идеи, связи и доказательства в единый граф</h1>
+          <div class="screenshots-layout" aria-label="Скриншоты извлечения гипотез">
+            <figure class="screenshot-card screenshot-card-search">
+              <div class="screenshot-frame hypothesis-extraction-frame">
+                <img src="assets/hypothesis-extraction-current-overview.png" alt="Экран индекса гипотез с графом доказательств и выбранной гипотезой">
+              </div>
+            </figure>
+            <div class="screenshot-feature">
+              <figure class="screenshot-card">
+                <div class="screenshot-frame hypothesis-extraction-frame">
+                  <img src="assets/hypothesis-extraction-current-source.png" alt="Экран графа гипотез с подсвеченным источником доказательства">
+                </div>
+              </figure>
+              <p class="screenshot-subtitle hypothesis-extraction-subtitle">Извлечение происходит под выполнение конкретной цели: карточки появляются за <strong>36,4 с медиана</strong>. Каждая идея связывается с <strong>KPI</strong>, а система определяет, <strong>подтверждает или опровергает</strong> источник гипотезу, и сохраняет контекст для следующего эксперимента.</p>
+            </div>
+          </div>
+        </section>
+        <section class="slide slide-evaluation" data-label="Оценка гипотез">
+          <h1>Метрики и паспорт показывают, какие гипотезы проверять</h1>
+          <div class="evaluation-layout" aria-label="Критерии и паспорт гипотезы">
+            <article class="evaluation-card">
+              <div class="evaluation-eyebrow">Что написано</div>
+              <h2>Паспорт объясняет, почему гипотезу стоит проверять</h2>
+              <div class="evaluation-passport-grid" aria-label="Поля паспорта гипотезы">
+                <div class="evaluation-passport-item"><strong>Суть</strong><span>проверяемое утверждение и ожидаемый эффект</span></div>
+                <div class="evaluation-passport-item"><strong>Механизм</strong><span>цепочка материал → процесс → свойство → KPI</span></div>
+                <div class="evaluation-passport-item"><strong>Проверка</strong><span>план эксперимента и критерий успеха</span></div>
+                <div class="evaluation-passport-item"><strong>Риски</strong><span>ограничения, противоречия и условия применимости</span></div>
+                <div class="evaluation-passport-item"><strong>Конкуренты</strong><span>альтернативные подходы, сильные и слабые стороны, отличие от существующих решений</span></div>
+                <div class="evaluation-passport-item"><strong>Trace</strong><span>модель, промпт, версия rank-v1 и история решений</span></div>
+              </div>
+            </article>
+            <article class="evaluation-card">
+              <div class="evaluation-eyebrow">Детерминированные метрики</div>
+              <h2>6 критериев оценки</h2>
+              <div class="evaluation-factor-grid" aria-label="Факторы оценки гипотезы">
+                <div class="evaluation-factor-row">
+                  <em>K</em>
+                  <span>Соответствие KPI</span>
+                  <strong>25%</strong>
+                </div>
+                <div class="evaluation-factor-row">
+                  <em>D</em>
+                  <span>Доказательная база</span>
+                  <strong>20%</strong>
+                </div>
+                <div class="evaluation-factor-row">
+                  <em>N</em>
+                  <span>Новизна</span>
+                  <strong>20%</strong>
+                </div>
+                <div class="evaluation-factor-row">
+                  <em>V</em>
+                  <span>Ценность</span>
+                  <strong>15%</strong>
+                </div>
+                <div class="evaluation-factor-row">
+                  <em>R</em>
+                  <span>Управляемость риска</span>
+                  <strong>10%</strong>
+                </div>
+                <div class="evaluation-factor-row">
+                  <em>G</em>
+                  <span>Готовность проверки</span>
+                  <strong>10%</strong>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+        <section class="slide slide-bridge-generation" data-label="Формирование гипотез">
+          <h1>Новые гипотезы появляются на стыке тем, где раньше не было прямой связи</h1>
+          <div class="bridge-layout" aria-label="Метод межтематических мостов для формирования новых гипотез">
+            <div class="bridge-map">
+              <div class="bridge-eyebrow">Как рождается идея</div>
+              <svg class="bridge-svg" viewBox="0 0 720 330" role="img" aria-label="Схема связи двух тем через общий механизм">
+                <defs>
+                  <marker id="bridgeArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#4338ca"/>
+                  </marker>
+                </defs>
+                <path d="M136 158 C260 34 452 34 584 158" fill="none" stroke="#dbe3ef" stroke-width="5" stroke-dasharray="12 12"/>
+                <path d="M162 176 C260 110 330 96 356 164" fill="none" stroke="#4338ca" stroke-width="7" stroke-linecap="round" marker-end="url(#bridgeArrow)"/>
+                <path d="M382 164 C414 94 488 112 558 176" fill="none" stroke="#4338ca" stroke-width="7" stroke-linecap="round" marker-end="url(#bridgeArrow)"/>
+                <circle cx="136" cy="186" r="64" fill="#ffffff" stroke="#0f172a" stroke-width="4"/>
+                <circle cx="360" cy="154" r="58" fill="#4338ca" stroke="#4338ca" stroke-width="4"/>
+                <circle cx="584" cy="186" r="64" fill="#ffffff" stroke="#0f172a" stroke-width="4"/>
+                <text x="136" y="177" text-anchor="middle" fill="#0f172a" font-size="30" font-weight="900">Тема</text>
+                <text x="136" y="211" text-anchor="middle" fill="#263244" font-size="18" font-weight="760">материал</text>
+                <text x="360" y="146" text-anchor="middle" fill="#ffffff" font-size="30" font-weight="900">Звено</text>
+                <text x="360" y="180" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="760">механизм</text>
+                <text x="584" y="177" text-anchor="middle" fill="#0f172a" font-size="30" font-weight="900">Цель</text>
+                <text x="584" y="211" text-anchor="middle" fill="#263244" font-size="18" font-weight="760">свойство</text>
+                <text x="360" y="55" text-anchor="middle" fill="#64748b" font-size="22" font-weight="820">прямая связь слабая или не найдена</text>
+              </svg>
+              <p><strong>В одной теме</strong> есть материал или процесс. <strong>В другой</strong> — нужное свойство или цель. Система ищет связующее звено и превращает такой стык в проверяемую гипотезу.</p>
+            </div>
+            <div class="bridge-step-grid">
+              <article class="bridge-step">
+                <div class="bridge-step-num">01</div>
+                <h2>Находим стык тем</h2>
+                <p>Ищем пары тем, которые похожи по смыслу, но почти не связаны напрямую. Именно там часто появляется новая идея.</p>
+              </article>
+              <article class="bridge-step">
+                <div class="bridge-step-num">02</div>
+                <h2>Ищем связующее звено</h2>
+                <p>Подбираем документ, метод, материал или механизм, который объясняет, почему две темы можно соединить.</p>
+              </article>
+              <article class="bridge-step">
+                <div class="bridge-step-num">03</div>
+                <h2>Формулируем гипотезу</h2>
+                <p>Из найденной связи собираем простое утверждение: что изменить, в каком объекте и какой эффект ожидать.</p>
+              </article>
+              <article class="bridge-step">
+                <div class="bridge-step-num">04</div>
+                <h2>Отсекаем слабое</h2>
+                <p>Оставляем только идеи с реальными источниками, признаками новизны и без повторов уже известных решений.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section class="slide slide-rag-evidence" data-label="Поиск подтверждений">
+          <div class="rag-left">
+            <h1>Подтверждения гипотез находятся в базе знаний и открытых источниках</h1>
+            <div class="rag-source-grid" aria-label="Источники для проверки подтверждений и новизны">
+              <article class="rag-source-card">
+                <strong>Патенты</strong>
+                <span>патентные документы и найденные совпадения показывают, не была ли идея уже защищена</span>
+              </article>
+              <article class="rag-source-card">
+                <strong>Статьи</strong>
+                <span>OpenAlex и Crossref подбирают научные публикации для блока мировой практики</span>
+              </article>
+              <article class="rag-source-card">
+                <strong>Внутренняя база</strong>
+                <span>отчёты, регламенты, загруженные PDF/Office-файлы и экспериментальные материалы</span>
+              </article>
+              <article class="rag-source-card">
+                <strong>Стандарты</strong>
+                <span>нормативные документы и технологические ограничения проверяют применимость идеи</span>
+              </article>
+            </div>
+          </div>
+          <div class="rag-right">
+            <figure class="rag-shot" aria-label="Скриншот поиска подтверждений в продукте">
+              <div class="rag-shot-frame">
+                <img src="assets/rag-open-sources.png" alt="Экран поиска подтверждений с ответом, источниками и текстом первоисточника">
+              </div>
+            </figure>
+            <p class="rag-subtitle">Поиск происходит не только в документах предприятия: система формирует научный запрос к <strong>открытым источникам</strong>, находит похожие <strong>статьи и патенты</strong> и помогает оценить <strong>мировую новизну</strong> гипотезы. DOI-ссылки ведут к первоисточнику, чтобы эксперт мог быстро проверить доказательную базу.</p>
+          </div>
+        </section>
+        <section class="slide slide-export" data-label="Экспорт">
+          <div class="export-left">
+            <h1>Гипотезы уходят в отчёт, таблицы и трекеры без ручной сборки</h1>
+            <div class="export-format-grid" aria-label="Поддерживаемые форматы экспорта">
+              <article class="export-format-card">
+                <strong>DOCX</strong>
+                <span>готовый Word-отчёт с резюме, гипотезами, источниками и оценками</span>
+              </article>
+              <article class="export-format-card">
+                <strong>PDF</strong>
+                <span>версия для печати, отправки руководителю и защиты результата</span>
+              </article>
+              <article class="export-format-card">
+                <strong>CSV · Excel</strong>
+                <span>табличная выгрузка портфеля гипотез, статусов и метрик</span>
+              </article>
+              <article class="export-format-card">
+                <strong>JSON · API</strong>
+                <span>структурированные данные для интеграций и внутренних сервисов</span>
+              </article>
+              <article class="export-format-card">
+                <strong>CSV · Jira</strong>
+                <span>передача проверок и задач в рабочий контур команды</span>
+              </article>
+              <article class="export-format-card">
+                <strong>JSON · задачи</strong>
+                <span>экспорт карточек для трекеров, автоматизаций и аналитики</span>
+              </article>
+            </div>
+          </div>
+          <figure class="export-right" aria-label="Скриншот экспортированного отчёта">
+            <div class="export-report-frame">
+              <img src="assets/export-report.png" alt="Отчёт по портфелю гипотез в формате документа">
+            </div>
+          </figure>
+        </section>
+        <section class="slide slide-cybersecurity" data-label="Кибербезопасность и архитектура">
+          <h1>Кибербезопасность и архитектура готовы к пилоту на R&amp;D-данных</h1>
+          <div class="cybersecurity-grid" aria-label="Ключевые меры кибербезопасности платформы">
+            <article class="cybersecurity-card">
+              <div class="cybersecurity-label">01</div>
+              <h2>Закрытый контур</h2>
+              <p>Эмбеддинги, OCR, реранкер и хранение работают локально; генерацию можно перевести на локальный LLM и отключить внешние публикации.</p>
+            </article>
+            <article class="cybersecurity-card">
+              <div class="cybersecurity-label">02</div>
+              <h2>Доступ и след</h2>
+              <p>JWT, роли и проверка owner_id ограничивают данные, а история, источники и trace показывают, кто что запросил и на чем основан ответ.</p>
+            </article>
+            <article class="cybersecurity-card">
+              <div class="cybersecurity-label">МС</div>
+              <h2>Микросервисная архитектура</h2>
+              <p>Прикладные и ML-компоненты разделены по зонам ответственности: загрузка данных, поиск, граф, генерация, хранение и наблюдаемость.</p>
+            </article>
+            <article class="cybersecurity-card">
+              <div class="cybersecurity-label">N×</div>
+              <h2>Масштабирование</h2>
+              <p>REST/WS, gRPC и RabbitMQ разделяют online-запросы и ingest; парсеры, OCR, воркеры и GPU-бэкенды масштабируются независимо.</p>
+            </article>
+          </div>
+        </section>
+        <section class="slide slide-roadmap" data-label="Roadmap">
+          <h1>Roadmap: усиливаем систему от пилота до промышленного R&amp;D-контура</h1>
+          <div class="roadmap-layout" aria-label="План развития системы">
+            <article class="roadmap-card">
+              <div class="roadmap-step">01</div>
+              <div class="roadmap-phase">Методология</div>
+              <h2>Шаблоны гипотез и контрфактуальный анализ</h2>
+              <p>Раскладывать идеи на материал, процесс, режим, условие, эффект и свойство; показывать, что изменится при замене состава или режима.</p>
+            </article>
+            <article class="roadmap-card">
+              <div class="roadmap-step">02</div>
+              <div class="roadmap-phase">Проверка</div>
+              <h2>Визуальный конструктор дорожных карт</h2>
+              <p>Собирать план проверки гипотезы из этапов, ресурсов, сроков, ответственных и критериев успеха для перехода к эксперименту.</p>
+            </article>
+            <article class="roadmap-card">
+              <div class="roadmap-step">03</div>
+              <div class="roadmap-phase">Фидбек</div>
+              <h2>Более тонкая настройка обучения</h2>
+              <p>Разделять сигналы одобрения, правок, отклонений, запусков экспериментов и экспорта, чтобы реранкер точнее подстраивался под оператора.</p>
+            </article>
+            <article class="roadmap-card">
+              <div class="roadmap-step">04</div>
+              <div class="roadmap-phase">Production</div>
+              <h2>Настройка безопасности в проде</h2>
+              <p>Довести SSO/MFA, Vault/KMS, immutable audit, SIEM, TLS/mTLS, DLP и политики внешних вызовов до требований промышленной эксплуатации.</p>
+            </article>
+          </div>
+        </section>
+        <section class="slide slide-integration" data-label="Интеграция">
+          <h1><span class="integration-nornickel">Норникель</span> <span class="integration-sign">+</span> <a class="integration-scid" href="https://scid.ai" target="_blank" rel="noopener noreferrer">scid.ai</a> <span class="integration-sign">=</span> технологическое лидерство</h1>
+          <div class="integration-body" aria-label="Интеграция Норникель и scid.ai">
+            <div class="integration-copy">
+              <p>Мы уже разработали продукт, который упрощает <strong>скаутинг технологий</strong>, мониторинг технологических трендов и генерацию технологических гипотез для <strong>10+ наукоёмких компаний</strong>.</p>
+              <p>Готовы предоставить сервис, который закроет эту потребность и в Норникеле.</p>
+            </div>
+            <div class="integration-contact" aria-label="Контакт scid.ai">
+              <div class="integration-qr-box">
+                <svg class="integration-qr-svg" viewBox="0 0 29 29" role="img" aria-label="QR-код для перехода на scid.ai"><rect width="29" height="29" fill="#fff"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM12 4h1v1h-1zM13 4h1v1h-1zM15 4h1v1h-1zM16 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM20 4h1v1h-1zM21 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM12 5h1v1h-1zM14 5h1v1h-1zM15 5h1v1h-1zM18 5h1v1h-1zM24 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM15 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM21 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM15 7h1v1h-1zM18 7h1v1h-1zM20 7h1v1h-1zM21 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM15 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM21 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM18 9h1v1h-1zM24 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM20 10h1v1h-1zM21 10h1v1h-1zM22 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM5 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM17 12h1v1h-1zM18 12h1v1h-1zM21 12h1v1h-1zM23 12h1v1h-1zM24 12h1v1h-1zM4 13h1v1h-1zM5 13h1v1h-1zM7 13h1v1h-1zM8 13h1v1h-1zM15 13h1v1h-1zM18 13h1v1h-1zM19 13h1v1h-1zM20 13h1v1h-1zM24 13h1v1h-1zM5 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM15 14h1v1h-1zM17 14h1v1h-1zM22 14h1v1h-1zM24 14h1v1h-1zM4 15h1v1h-1zM6 15h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM9 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM20 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM24 15h1v1h-1zM4 16h1v1h-1zM5 16h1v1h-1zM6 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM11 16h1v1h-1zM15 16h1v1h-1zM19 16h1v1h-1zM21 16h1v1h-1zM13 17h1v1h-1zM17 17h1v1h-1zM19 17h1v1h-1zM24 17h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM8 18h1v1h-1zM9 18h1v1h-1zM10 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM14 18h1v1h-1zM16 18h1v1h-1zM18 18h1v1h-1zM20 18h1v1h-1zM21 18h1v1h-1zM22 18h1v1h-1zM23 18h1v1h-1zM4 19h1v1h-1zM10 19h1v1h-1zM12 19h1v1h-1zM15 19h1v1h-1zM18 19h1v1h-1zM19 19h1v1h-1zM20 19h1v1h-1zM24 19h1v1h-1zM4 20h1v1h-1zM6 20h1v1h-1zM7 20h1v1h-1zM8 20h1v1h-1zM10 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM17 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM21 20h1v1h-1zM4 21h1v1h-1zM6 21h1v1h-1zM7 21h1v1h-1zM8 21h1v1h-1zM10 21h1v1h-1zM18 21h1v1h-1zM20 21h1v1h-1zM23 21h1v1h-1zM24 21h1v1h-1zM4 22h1v1h-1zM6 22h1v1h-1zM7 22h1v1h-1zM8 22h1v1h-1zM10 22h1v1h-1zM12 22h1v1h-1zM15 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM4 23h1v1h-1zM10 23h1v1h-1zM12 23h1v1h-1zM14 23h1v1h-1zM15 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM18 23h1v1h-1zM4 24h1v1h-1zM5 24h1v1h-1zM6 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM9 24h1v1h-1zM10 24h1v1h-1zM13 24h1v1h-1zM15 24h1v1h-1zM16 24h1v1h-1zM17 24h1v1h-1zM20 24h1v1h-1zM23 24h1v1h-1z" fill="currentColor"/></svg>
+              </div>
+              <a href="https://scid.ai" target="_blank" rel="noopener noreferrer">scid.ai</a>
+              <span>QR для связи и обсуждения пилота</span>
+            </div>
+          </div>
+        </section>
+        <section class="slide slide-thanks" data-label="Спасибо">
+          <h1>Спасибо за внимание<span class="thanks-team"><span class="thanks-prefix">с вами были</span>Квадрицепс</span></h1>
+        </section>
+        <section class="slide slide-metrics" data-label="Метрики стенда">
+          <h1>Пример метрик стенда: скорость, бюджет и unit-экономика</h1>
+          <div class="metrics-grid" aria-label="Таблицы с ключевыми метриками стенда">
+            <article class="metrics-table-card">
+              <h2>Путь запроса</h2>
+              <table class="metrics-table">
+                <tbody>
+                  <tr><td>Эмбеддинг</td><td><strong>38 мс p50</strong>, 49 мс p95</td></tr>
+                  <tr><td>Qdrant</td><td><strong>5 мс p50</strong>, 10 мс p95</td></tr>
+                  <tr><td>BM25 / OpenSearch</td><td><strong>10 мс p50</strong>, 24 мс p95</td></tr>
+                  <tr><td>Реранкинг</td><td><strong>3,8 с p50</strong>, 4,9 с p95</td></tr>
+                </tbody>
+              </table>
+            </article>
+            <article class="metrics-table-card">
+              <h2>Задачи гипотез</h2>
+              <table class="metrics-table">
+                <tbody>
+                  <tr><td>Генерация</td><td><strong>36,4 с</strong> медиана, 154,2 с максимум</td></tr>
+                  <tr><td>Автопроверка</td><td><strong>12,4 с</strong> медиана, 33,3 с максимум</td></tr>
+                  <tr><td>Дополнение</td><td><strong>18,7 с</strong> медиана, 85 с максимум</td></tr>
+                  <tr><td>УГТ / конкуренты</td><td><strong>7,7 с / 3,6 с</strong> медиана</td></tr>
+                </tbody>
+              </table>
+            </article>
+            <article class="metrics-table-card">
+              <h2>LLM-бюджет</h2>
+              <table class="metrics-table">
+                <tbody>
+                  <tr><td>Демо-сессия</td><td><strong>порядок 10³</strong> LLM-запросов</td></tr>
+                  <tr><td>Недельный прогон</td><td><strong>порядок 10⁷</strong> токенов</td></tr>
+                  <tr><td>Стоимость</td><td><strong>сотни ₽</strong> при малой демо-нагрузке</td></tr>
+                </tbody>
+              </table>
+            </article>
+            <article class="metrics-table-card">
+              <h2>Провайдеры</h2>
+              <table class="metrics-table">
+                <tbody>
+                  <tr><td>OpenRouter</td><td><strong>usage API</strong> для фактического расхода</td></tr>
+                  <tr><td>Yandex AI Studio</td><td><strong>расчёт по прайсу</strong> за 1 млн токенов</td></tr>
+                  <tr><td>Локальный LLM</td><td><strong>без token billing</strong>, расход в GPU-часах</td></tr>
+                </tbody>
+              </table>
+            </article>
+            <article class="metrics-table-card">
+              <h2>Unit-экономика</h2>
+              <table class="metrics-table">
+                <tbody>
+                  <tr><td>1 гипотеза</td><td><strong>1–3 запроса</strong> и тысячи токенов</td></tr>
+                  <tr><td>Стоимость</td><td><strong>копейки–десятки копеек</strong> на гипотезу</td></tr>
+                  <tr><td>База расчёта</td><td>пересчитывается по текущему `llm_usage`</td></tr>
+                  <tr><td>Нагрузка</td><td>generate → verify → enrich → assess_trl</td></tr>
+                </tbody>
+              </table>
+            </article>
+            <article class="metrics-table-card">
+              <h2>Оценка железа</h2>
+              <table class="metrics-table">
+                <tbody>
+                  <tr><td>Запуск</td><td>Docker 24+ и Compose v2</td></tr>
+                  <tr><td>GPU-стек</td><td><strong>~7 ГБ VRAM</strong> для embeddings, rerank и OCR</td></tr>
+                  <tr><td>Локальный LLM</td><td>добавляет <strong>~3–19 ГБ VRAM</strong> по модели</td></tr>
+                  <tr><td>Диск</td><td><strong>~25 ГБ</strong> на образы и веса моделей</td></tr>
+                </tbody>
+              </table>
+            </article>
+          </div>
+          <p class="metrics-footnote"><strong>Шаблон для пересъёма:</strong> заполните таблицу из `/admin/perf` и `/admin/llm-usage` на целевом контуре. Значения на слайде иллюстративные; для времени показывайте p50 / p95 или медиану / максимум, для денег — usage API провайдера или расчёт по утверждённому прайсу.</p>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const DESIGN_WIDTH = 1920;
+      const DESIGN_HEIGHT = 1080;
+      document.documentElement.classList.add("js-ready");
+      const deckShell = document.getElementById("deckShell");
+      const deck = document.getElementById("deck");
+      const slides = Array.from(deck.querySelectorAll(".slide"));
+      let activeIndex = initialIndex();
+
+      function initialIndex() {
+        const parsed = Number.parseInt(window.location.hash.replace("#", ""), 10);
+        if (Number.isFinite(parsed) && parsed >= 1 && parsed <= slides.length) {
+          return parsed - 1;
+        }
+        return 0;
+      }
+
+      function scaleDeck() {
+        const scale = Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / DESIGN_HEIGHT);
+        deckShell.style.width = `${DESIGN_WIDTH * scale}px`;
+        deckShell.style.height = `${DESIGN_HEIGHT * scale}px`;
+        deck.style.transform = `scale(${scale})`;
+      }
+
+      function showSlide(nextIndex) {
+        activeIndex = Math.max(0, Math.min(slides.length - 1, nextIndex));
+        slides.forEach((slide, index) => {
+          const isActive = index === activeIndex;
+          slide.toggleAttribute("data-active", isActive);
+          slide.setAttribute("aria-hidden", String(!isActive));
+        });
+        history.replaceState(null, "", `#${activeIndex + 1}`);
+      }
+
+      function nextSlide() {
+        showSlide(activeIndex + 1);
+      }
+
+      function previousSlide() {
+        showSlide(activeIndex - 1);
+      }
+
+      window.addEventListener("resize", scaleDeck);
+      window.addEventListener("hashchange", () => showSlide(initialIndex()));
+      document.addEventListener("keydown", (event) => {
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+
+        switch (event.key) {
+          case "ArrowRight":
+          case "ArrowDown":
+          case "PageDown":
+          case " ":
+            event.preventDefault();
+            nextSlide();
+            break;
+          case "ArrowLeft":
+          case "ArrowUp":
+          case "PageUp":
+            event.preventDefault();
+            previousSlide();
+            break;
+          case "Home":
+            event.preventDefault();
+            showSlide(0);
+            break;
+          case "End":
+            event.preventDefault();
+            showSlide(slides.length - 1);
+            break;
+          default:
+            break;
+        }
+      });
+      document.addEventListener("click", (event) => {
+        if (event.clientX > window.innerWidth / 2) {
+          nextSlide();
+        } else {
+          previousSlide();
+        }
+      });
+
+      scaleDeck();
+      showSlide(activeIndex);
+    })();
+  </script>
+</body>
+</html>

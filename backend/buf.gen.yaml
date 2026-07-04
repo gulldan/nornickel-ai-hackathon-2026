@@ -1,0 +1,18 @@
+# buf generation config for checked-in protobuf contracts. go_package is set
+# explicitly in the .proto files, so managed mode stays off.
+version: v2
+managed:
+  enabled: false
+plugins:
+  - local: protoc-gen-go
+    out: platform/pkg/genproto
+    opt: module=github.com/example/rag-mvp
+  - local: protoc-gen-go-grpc
+    out: platform/pkg/genproto
+    opt: module=github.com/example/rag-mvp
+  # Python + gRPC-Python stubs into the same central tree. Hosted plugins avoid
+  # local grpcio-tools/protoc plugin setup.
+  - remote: buf.build/protocolbuffers/python
+    out: platform/pkg/genproto
+  - remote: buf.build/grpc/python
+    out: platform/pkg/genproto

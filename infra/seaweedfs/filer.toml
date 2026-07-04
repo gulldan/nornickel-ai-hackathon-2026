@@ -1,0 +1,15 @@
+[filer.options]
+recursive_delete = false
+
+[leveldb2]
+enabled = true
+dir = "/data/filerldb2"
+
+[leveldb3]
+enabled = false
+
+[rocksdb]
+enabled = false
+
+[sqlite]
+enabled = false

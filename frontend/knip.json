@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["src/**/*.test.{ts,tsx}", "scripts/*.ts", "tests/e2e/**/*.spec.ts"],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.ts"],
+  "ignoreDependencies": [
+    "tailwindcss",
+    "@fontsource-variable/golos-text",
+    "@fontsource-variable/inter-tight",
+    "@fontsource-variable/jetbrains-mono"
+  ]
+}

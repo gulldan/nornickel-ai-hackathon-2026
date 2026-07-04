@@ -1,0 +1,98 @@
+{
+  "bar": {
+    "queryAriaLabel": "搜索查询",
+    "placeholder": "就您的文档提问…",
+    "submit": "搜索"
+  },
+  "home": {
+    "greeting": "有什么可以帮您？",
+    "greetingNamed": "有什么可以帮您，{{name}}？",
+    "subtitle": "我们会在文献中找到结论，展示来源中的确切位置，并围绕您的目标整理可验证的假设",
+    "starterTopics": "来自您文档的主题",
+    "recentQueries": "最近的查询"
+  },
+  "results": {
+    "openingSaved": "正在打开已保存的对话…",
+    "openSavedError": "无法打开已保存的对话。",
+    "turnFailed": "回答未生成或未保存。",
+    "askAgain": "再问一次",
+    "followUpPlaceholder": "继续提问或补充细节…",
+    "followUpAriaLabel": "追问",
+    "ask": "提问",
+    "preview": {
+      "ariaLabel": "文档预览",
+      "kicker": "原始来源",
+      "viewAriaLabel": "文档视图",
+      "tabOriginal": "文档",
+      "tabText": "文本",
+      "close": "关闭预览"
+    }
+  },
+  "answer": {
+    "questionAriaLabel": "问题：{{question}}",
+    "questionKicker": "问题",
+    "fromDocs": "回答基于您的文档整理而成",
+    "cached": "来自缓存",
+    "searching": "正在检索文档并整理回答——通常最多需要一分钟。",
+    "failed": "回答未生成——请重试。",
+    "abstain": {
+      "noSources": "未找到与您的查询相关的内容：已上传的文档中没有合适的片段。请尝试换一种问法或上传更多文档。",
+      "weakEvidence": "未找到与您的查询相关的内容：检索到的片段与问题关联太弱，因此未生成回答。请尝试换一种问法。"
+    },
+    "openSourceAt": "在此处打开来源 {{label}}",
+    "copied": "回答已复制",
+    "copy": "复制",
+    "basedOn_other": "基于 {{count}} 个来源",
+    "sourcesHeading": "来源 · {{count}}"
+  },
+  "trace": {
+    "title": "检索过程",
+    "stages": {
+      "embed": "解析查询",
+      "retrieve": "知识库检索",
+      "rerank": "重新排序",
+      "generate": "生成回答",
+      "total": "总计"
+    },
+    "candidates": "候选：按语义 {{dense}} 条 + 按词条 {{lexical}} 条",
+    "fused": "合并后 {{count}} 条",
+    "returned": "{{count}} 条进入回答",
+    "raptorExpanded": "部分来源通过文档摘要找到并展开为精确引文（{{count}}）",
+    "degraded": {
+      "rerankerUnavailable": "重新排序不可用——来源顺序为近似结果",
+      "embedUnavailable": "语义检索不可用——仅按精确词条检索",
+      "denseUnavailable": "语义检索不可用——仅按精确词条检索",
+      "lexicalUnavailable": "词条检索不可用——仅按语义检索",
+      "default": "部分检索以简化模式运行"
+    },
+    "uncitedRemoved": "已从回答中移除检索来源中不存在的引用：{{count}}",
+    "noTrace": "此回答未保存详细的检索记录。",
+    "cachedNote": "回答来自缓存",
+    "model": "模型 {{model}}",
+    "seconds": "{{value}} 秒",
+    "millis": "{{value}} 毫秒"
+  },
+  "history": {
+    "kicker": "知识库",
+    "title": "查询历史",
+    "description": "已保存的对话（含回答与来源）——点击即可打开",
+    "filterPlaceholder": "在已加载的历史中搜索",
+    "filterAriaLabel": "搜索历史",
+    "scopeAriaLabel": "历史范围",
+    "scopeMine": "我的",
+    "scopeAll": "所有用户",
+    "loadingAriaLabel": "正在加载历史",
+    "loadError": "无法加载历史——请检查网络连接后重试。",
+    "emptyTitle": "历史暂时为空",
+    "emptyDescription": "您的搜索查询将显示在这里",
+    "notFoundTitle": "未找到任何内容",
+    "notFoundDescription": "请尝试其他关键词，或加载下一页历史",
+    "pageInfo_other": "第 {{page}} / {{pageCount}} 页 · 共 {{count}} 条查询",
+    "foundOnPage": "本页找到 {{count}} 条",
+    "openChatAriaLabel": "打开对话：{{title}}",
+    "byUser": "来自 {{name}}",
+    "source": {
+      "search": "搜索"
+    }
+  }
+}

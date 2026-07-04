@@ -1,0 +1,23 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    # sqlc reads the goose migrations as the schema (it applies the Up parts).
+    schema: "internal/infrastructure/postgres/migrations"
+    queries: "internal/infrastructure/postgres/queries"
+    gen:
+      go:
+        package: "sqlcgen"
+        out: "internal/infrastructure/postgres/sqlcgen"
+        sql_package: "pgx/v5"
+        emit_interface: true
+        emit_empty_slices: true
+        emit_pointers_for_null_types: true
+        overrides:
+          # All timestamptz columns are NOT NULL; map to time.Time (not pgtype)
+          # so the repositories speak the same type as the domain entities.
+          - db_type: "timestamptz"
+            go_type: "time.Time"
+          # The only `date` column is llm_usage_daily.day; map it to time.Time too
+          # so the usage repo speaks plain time.Time, not pgtype.Date.
+          - db_type: "date"
+            go_type: "time.Time"

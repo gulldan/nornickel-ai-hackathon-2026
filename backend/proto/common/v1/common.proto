@@ -1,0 +1,304 @@
+syntax = "proto3";
+
+// Package rag.common.v1 holds every type that crosses a service boundary: the
+// DTOs returned by db-service, the RAG request/response, and the ingestion
+// events that travel as protobuf binary over RabbitMQ. Timestamps are RFC3339
+// strings and statuses are strings (mirroring the DB) to keep JSON at the REST
+// edge stable and avoid enum<->string churn.
+package rag.common.v1;
+
+option go_package = "github.com/example/rag-mvp/pkg/genproto/common/v1;commonv1";
+
+// ---- DTOs (db-service) ----
+
+message User {
+  string id = 1;
+  string username = 2;
+  string password_hash = 3; // populated only on the internal credential lookup
+  repeated string roles = 4;
+  string created_at = 5;
+}
+
+message Document {
+  string id = 1;
+  string owner_id = 2;
+  string filename = 3;
+  string mime_type = 4;
+  int64 size = 5;
+  string object_key = 6;
+  string status = 7;
+  string status_msg = 8;
+  int32 chunk_count = 9;
+  string created_at = 10;
+  string updated_at = 11;
+  // BLAKE3-256 hex содержимого файла — основа дедупликации: совпадающий хеш
+  // означает байт-в-байт тот же документ, и он не индексируется повторно.
+  string content_hash = 12;
+  // Настоящее название статьи, извлечённое из текста при индексации (LLM).
+  // Пустая строка — заголовок ещё не извлечён; UI показывает имя файла.
+  string title = 13;
+  // Метаданные из парсера (email-заголовки, PDF docinfo); "" — не извлечено.
+  string author = 14;
+  string published_at = 15;
+  string source_ref = 16;
+  // Класс документа, определённый при индексации: "" — обычный документ,
+  // "hypotheses" — готовые гипотезы/идеи (итоги мозгового штурма). Такие
+  // документы не участвуют в retrieval генерации и проверки гипотез.
+  string kind = 17;
+}
+
+message Chat {
+  string id = 1;
+  string owner_id = 2;
+  string title = 3;
+  string created_at = 4;
+  // Page the conversation started from ("search"); "" on legacy rows.
+  string source = 5;
+  // Owner username resolved on reads for history views; not stored on the row.
+  string owner_username = 6;
+}
+
+message Source {
+  string document_id = 1;
+  string filename = 2;
+  string chunk_id = 3;
+  string snippet = 4;
+  double score = 5;
+  // Span provenance for grounded citations. char_start/char_end are 0-based
+  // [start, end) rune offsets of the chunk within the document's extracted text,
+  // populated by chunk-splitter (which owns the splitting and therefore the
+  // offsets). page_start/page_end and section_heading are reserved for
+  // structured-parse output and stay 0 / "" until a parser supplies document
+  // structure. All additive (fields 6-10) — old payloads simply read as zero.
+  int32 char_start = 6;
+  int32 char_end = 7;
+  int32 page_start = 8;
+  int32 page_end = 9;
+  string section_heading = 10;
+  // Retrieval provenance (additive): which retriever surfaced the chunk
+  // ("dense" | "bm25" | "both") and, when the chunk was materialized by
+  // expanding a RAPTOR summary node, the id of that summary point.
+  string origin = 11;
+  string raptor_summary_id = 12;
+}
+
+message Message {
+  string id = 1;
+  string chat_id = 2;
+  string role = 3;
+  string content = 4;
+  repeated Source sources = 5;
+  string created_at = 6;
+  // Raw-JSON envelope for answer provenance ({model, cached, trace}), stored
+  // as chat_messages.meta; "" for user messages and legacy rows.
+  string meta = 7;
+}
+
+message Model {
+  string id = 1;
+  string name = 2;
+  string role = 3;
+  string backend = 4;
+}
+
+// ---- Ingestion events (protobuf binary over RabbitMQ) ----
+
+message DocumentUploaded {
+  string document_id = 1;
+  string owner_id = 2;
+  string object_key = 3;
+  string filename = 4;
+  string mime_type = 5;
+  int64 size = 6;
+  string trace_id = 7;
+  // Глубина вложенности для документов, извлечённых из архивов: 0 — обычная
+  // загрузка, 1 — файл из архива, 2 — файл из архива внутри архива.
+  // archive-worker не распаковывает архивы глубже двух уровней.
+  int32 archive_depth = 8;
+}
+
+message DocumentParsed {
+  string document_id = 1;
+  string owner_id = 2;
+  string object_key = 3;
+  string filename = 4;
+  string mime_type = 5;
+  string source = 6; // email|office|pdf|ocr|vlm|text
+  string text = 7;
+  map<string, string> metadata = 8;
+  string trace_id = 9;
+  // Claim check: when the extracted text is too large for an AMQP body, the
+  // parser stores it in S3 and sends the object key instead of `text`.
+  string text_object_key = 10;
+}
+
+message DocumentIndexed {
+  string document_id = 1;
+  string owner_id = 2;
+  int32 chunk_count = 3;
+  string trace_id = 4;
+}
+
+message IngestionEvent {
+  string document_id = 1;
+  string owner_id = 2;
+  string status = 3;
+  string message = 4;
+  string timestamp = 5; // RFC3339
+  // Optional progress within the current stage (e.g. OCR pages, embed batches);
+  // both stay 0 when a stage has no measurable progress.
+  int32 stage_current = 6;
+  int32 stage_total = 7;
+}
+
+// ---- RAG (llm-service) ----
+
+message RagRequest {
+  string owner_id = 1;
+  string query = 2;
+  int32 top_k = 3;
+  bool stream = 4;
+  // Optional generation prompt. When set, retrieval/rerank use `query` (kept
+  // short) while the LLM generates from `prompt` — so a long instruction (e.g.
+  // hypothesis generation) does not inflate the reranker input.
+  string prompt = 5;
+  // Optional retrieval scope: restrict to / exclude these document ids.
+  repeated string scope_document_ids = 6;
+  repeated string exclude_document_ids = 7;
+}
+
+// One timed step of the answer pipeline ("embed", "retrieve", "rerank",
+// "generate", "total").
+message RagStage {
+  string stage = 1;
+  int64 millis = 2;
+}
+
+// RagTrace explains how an answer was produced: stage timings, candidate
+// counts at each funnel step, degradation/abstain reasons and the citation
+// report. It exists so the UI can show "how we searched" instead of a black
+// box; every field is already computed inside llm-service.
+message RagTrace {
+  repeated RagStage stages = 1;
+  int32 candidates_dense = 2;    // from Qdrant
+  int32 candidates_lexical = 3;  // from OpenSearch BM25
+  int32 candidates_fused = 4;    // after RRF
+  int32 candidates_returned = 5; // final top-k after cap-per-doc
+  bool degraded = 6;             // one of the retrieval/rerank legs failed
+  string degraded_reason = 7;    // "" | "reranker_unavailable" | "dense_unavailable" | "lexical_unavailable" | "embed_unavailable"
+  string abstain_reason = 8;     // "" | "no_sources" | "weak_evidence"
+  double top_score = 9;          // best rerank score before the floor check
+  double score_floor = 10;
+  repeated string cited = 11;        // [Sn] markers actually present in the answer
+  repeated string uncited_removed = 12; // hallucinated markers stripped by the sanitizer
+  int32 raptor_expanded = 13;    // summary nodes expanded into leaf chunks
+}
+
+message RagResponse {
+  string answer = 1;
+  repeated Source sources = 2;
+  string model = 3;
+  bool cached = 4;
+  RagTrace trace = 5;
+}
+
+// ---- Hypothesis Factory (db-service) ----
+// DTOs for the hypothesis-generation domain. Nullable storage columns are
+// proto3 `optional` (field presence); JSONB blobs travel as raw-JSON strings;
+// timestamps are RFC3339 strings, mirroring the DTOs above. The full object
+// shape is documented in schemas/hypothesis/v1.
+
+message KPI {
+  string id = 1;
+  string owner_id = 2;
+  string title = 3;
+  string description = 4;
+  string metric = 5; // measured quantity
+  string unit = 6;
+  string direction = 7;         // increase | decrease | maintain
+  optional double baseline = 8; // unset = unknown / qualitative
+  optional double target = 9;
+  string function_area = 10;
+  string status = 11; // active | archived
+  string detail = 12; // raw JSON object
+  string created_at = 13;
+  string updated_at = 14;
+}
+
+message Cluster {
+  string id = 1;
+  string owner_id = 2;
+  string label = 3;
+  string summary = 4;
+  repeated string keywords = 5;
+  string method = 6;
+  int32 chunk_count = 7;
+  int32 document_count = 8;
+  string representatives = 9; // raw JSON array
+  string params = 10;         // raw JSON object
+  string status = 11;
+  string created_at = 12;
+  string updated_at = 13;
+}
+
+message HypothesisEvidence {
+  string id = 1;
+  string hypothesis_id = 2;
+  optional string document_id = 3; // unset once the source document is deleted
+  string chunk_id = 4;             // Qdrant/OpenSearch id; "" = document-level
+  string filename = 5;
+  string snippet = 6;
+  string stance = 7; // supports | contradicts | context
+  optional double score = 8;
+  int32 ord = 9;
+  string created_at = 10;
+  string relation = 11;        // how the fragment relates to the hypothesis (conditions → effect, with numbers)
+  int32 page_start = 12;       // 1-based page span in the source document; 0 = unknown
+  int32 page_end = 13;
+  string section_heading = 14; // enclosing section, when the parser supplied structure
+  string origin = 15;          // "" | input | knowledge | web
+}
+
+message HypothesisRevision {
+  string id = 1;
+  string hypothesis_id = 2;
+  int32 revision_no = 3; // assigned server-side on write
+  string editor_id = 4;  // "" = system
+  string action = 5;     // created | edited | status_changed | score_override | approved | rejected | commented
+  string summary = 6;
+  string patch = 7; // raw JSON object: {"before": ..., "after": ...}
+  string created_at = 8;
+}
+
+message Hypothesis {
+  string id = 1;
+  string owner_id = 2;
+  string run_id = 3;
+  string title = 4;
+  string statement = 5;
+  string rationale = 6;
+  string method = 7; // cluster_kpi | transfer | gap | combination | manual
+  string status = 8; // draft | generated | under_review | approved | rejected | archived
+  optional string kpi_id = 9;
+  optional string primary_cluster_id = 10;
+  optional int32 trl = 11; // 1..9
+  optional double novelty_score = 12;
+  optional double risk_score = 13; // higher = riskier
+  optional double value_score = 14;
+  optional double confidence_score = 15;
+  optional double composite_score = 16; // ranking output
+  bool measurable = 17;                  // false = scientific hypothesis without a measurable effect
+  string organization = 18;
+  string function_area = 19;
+  string source_type = 20;
+  string location = 21;
+  repeated string tags = 22;
+  string assessment = 23; // raw JSON object
+  string detail = 24;     // raw JSON object
+  string generation = 25; // raw JSON object
+  string created_at = 26;
+  string updated_at = 27;
+  // Evidence is populated by GetHypothesis and carried on CreateHypothesis;
+  // ListHypotheses leaves it empty.
+  repeated HypothesisEvidence evidence = 28;
+}

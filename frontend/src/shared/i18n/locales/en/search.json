@@ -1,0 +1,110 @@
+{
+  "bar": {
+    "queryAriaLabel": "Search query",
+    "placeholder": "Ask a question about your documents…",
+    "submit": "Search"
+  },
+  "home": {
+    "greeting": "How can we help?",
+    "greetingNamed": "How can we help, {{name}}?",
+    "subtitle": "We'll find conclusions in publications, show the exact places in the sources and assemble verifiable hypotheses for your goal",
+    "starterTopics": "Topics from your documents",
+    "recentQueries": "Recent queries"
+  },
+  "results": {
+    "openingSaved": "Opening the saved conversation…",
+    "openSavedError": "Failed to open the saved conversation.",
+    "turnFailed": "The answer failed or was not saved.",
+    "askAgain": "Ask again",
+    "followUpPlaceholder": "Ask more or clarify…",
+    "followUpAriaLabel": "Follow-up question",
+    "ask": "Ask",
+    "preview": {
+      "ariaLabel": "Document preview",
+      "kicker": "Original source",
+      "viewAriaLabel": "Document view",
+      "tabOriginal": "Document",
+      "tabText": "Text",
+      "close": "Close preview"
+    }
+  },
+  "answer": {
+    "questionAriaLabel": "Question: {{question}}",
+    "questionKicker": "Question",
+    "fromDocs": "Answer assembled from your documents",
+    "cached": "from cache",
+    "searching": "Searching the documents and assembling the answer — this usually takes up to a minute.",
+    "failed": "The answer failed — please try again.",
+    "abstain": {
+      "noSources": "Nothing was found for your query: the uploaded documents contain no suitable fragments. Try rephrasing the question or uploading more documents.",
+      "weakEvidence": "Nothing was found for your query: the retrieved fragments are only weakly related to the question, so no answer was composed. Try phrasing the question differently."
+    },
+    "openSourceAt": "Open source {{label}} at this spot",
+    "copied": "Answer copied",
+    "copy": "Copy",
+    "basedOn_one": "Based on {{count}} source",
+    "basedOn_other": "Based on {{count}} sources",
+    "sourcesHeading": "Sources · {{count}}"
+  },
+  "sourceHypotheses": {
+    "heading": "Hypotheses from these sources",
+    "empty": "No hypotheses are linked to these sources yet.",
+    "loadError": "Failed to load hypotheses for the sources.",
+    "generate": "Generate hypotheses from these sources",
+    "generating": "Generating hypotheses — this can take a few minutes…",
+    "generated_one": "Done: {{count}} new hypothesis from these sources.",
+    "generated_other": "Done: {{count}} new hypotheses from these sources.",
+    "generateError": "Hypothesis generation failed — please try again."
+  },
+  "trace": {
+    "title": "How we searched",
+    "stages": {
+      "embed": "query parsing",
+      "retrieve": "knowledge-base search",
+      "rerank": "reranking",
+      "generate": "answer composition",
+      "total": "total"
+    },
+    "candidates": "Candidates: {{dense}} by meaning + {{lexical}} by exact terms",
+    "fused": "{{count}} after merging",
+    "returned": "{{count}} into the answer",
+    "raptorExpanded": "Some sources were found via document summaries and expanded to exact citations ({{count}})",
+    "degraded": {
+      "rerankerUnavailable": "reranking was unavailable — the source order is approximate",
+      "embedUnavailable": "semantic search was unavailable — we searched by exact terms only",
+      "denseUnavailable": "semantic search was unavailable — we searched by exact terms only",
+      "lexicalUnavailable": "term search was unavailable — we searched by meaning only",
+      "default": "part of the search ran in a simplified mode"
+    },
+    "uncitedRemoved": "References not backed by the retrieved sources were removed from the answer: {{count}}",
+    "noTrace": "No detailed trace was saved for this answer.",
+    "cachedNote": "answer from cache",
+    "model": "model {{model}}",
+    "seconds": "{{value}} s",
+    "millis": "{{value}} ms"
+  },
+  "history": {
+    "kicker": "Knowledge base",
+    "title": "Query history",
+    "description": "Saved conversations with answers and sources — click to open",
+    "filterPlaceholder": "Search the loaded history",
+    "filterAriaLabel": "Search history",
+    "scopeAriaLabel": "Whose history",
+    "scopeMine": "Mine",
+    "scopeAll": "All users",
+    "loadingAriaLabel": "Loading history",
+    "loadError": "Failed to load the history — check your connection and try again.",
+    "emptyTitle": "No history yet",
+    "emptyDescription": "Your search queries will appear here",
+    "notFoundTitle": "Nothing found",
+    "notFoundDescription": "Try a different word or load the next page of history",
+    "pageInfo_one": "Page {{page}} of {{pageCount}} · {{count}} query in total",
+    "pageInfo_other": "Page {{page}} of {{pageCount}} · {{count}} queries in total",
+    "foundOnPage": "Found {{count}} on this page",
+    "openChatAriaLabel": "Open conversation: {{title}}",
+    "byUser": "by {{name}}",
+    "source": {
+      "search": "Search"
+    }
+  }
+}

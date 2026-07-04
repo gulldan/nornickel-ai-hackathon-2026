@@ -1,0 +1,308 @@
+/* Self-hosted variable fonts (Cyrillic + Latin, via @fontsource):
+   Golos Text — body/UI, Inter Tight — display headlines, JetBrains Mono —
+   data, metadata and mono-caps labels. A CSS @import must precede all other
+   rules, so the font imports stay above the Tailwind import. */
+@import "@fontsource-variable/golos-text";
+@import "@fontsource-variable/inter-tight";
+@import "@fontsource-variable/jetbrains-mono";
+
+@import "tailwindcss";
+
+:root {
+  /* «Bold»: тёплая бумага, холодные чернила, один ультрамариновый акцент;
+     семантика статусов — приглушённые лабораторные цвета (виридиан/охра/
+     киноварь), не дефолтные emerald/amber/red. */
+  --background: oklch(0.988 0.003 95); /* бумага */
+  --foreground: oklch(0.217 0.015 262); /* чернила */
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.217 0.015 262); /* чернильные действия */
+  --primary-foreground: oklch(0.988 0.003 95);
+  --secondary: oklch(0.963 0.005 98);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.963 0.005 98);
+  --muted-foreground: oklch(0.508 0.02 262);
+  --accent: oklch(0.953 0.022 268); /* лёгкая ультрамариновая заливка hover */
+  --accent-foreground: oklch(0.353 0.168 267);
+  --destructive: oklch(0.544 0.163 33); /* киноварь */
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.918 0.008 262);
+  --input: oklch(0.918 0.008 262);
+  --ring: oklch(0.434 0.208 267);
+  --brand: oklch(0.434 0.208 267); /* ультрамарин */
+  --brand-foreground: oklch(1 0 0);
+  --brand-wash: oklch(0.953 0.022 268);
+  --brand-border: oklch(0.867 0.06 268);
+  --ok: oklch(0.523 0.1 168); /* виридиан: подтверждено/готово */
+  --ok-wash: oklch(0.959 0.035 168);
+  --warn: oklch(0.522 0.111 78); /* охра: проверить/внимание */
+  --warn-wash: oklch(0.963 0.045 92);
+  --risk: var(--destructive);
+  --risk-wash: oklch(0.954 0.025 33);
+  --marker: oklch(0.903 0.162 98); /* жёлтый маркер цитат */
+  --chart-1: var(--brand);
+  --chart-2: var(--ok);
+  --chart-3: oklch(0.7 0.13 82);
+  --chart-4: var(--destructive);
+  --chart-5: oklch(0.508 0.02 262);
+  --radius: 0.625rem;
+  --sidebar: var(--background);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--foreground);
+  --sidebar-primary-foreground: var(--background);
+  --sidebar-accent: oklch(0.943 0.007 98);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+}
+
+/* Единый и единственный источник дизайн-токенов для Tailwind-утилит
+   (Tailwind 4). `inline` означает, что утилиты (bg-brand, text-ok, font-mono…)
+   ссылаются на переменные :root выше — значения живут в одном месте, а не
+   дублируются во внешнем Tailwind-конфиге. Графики и произвольный CSS читают те же
+   var(--brand)/var(--ok). */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-wash: var(--brand-wash);
+  --color-brand-border: var(--brand-border);
+  --color-ok: var(--ok);
+  --color-ok-wash: var(--ok-wash);
+  --color-warn: var(--warn);
+  --color-warn-wash: var(--warn-wash);
+  --color-risk: var(--risk);
+  --color-risk-wash: var(--risk-wash);
+  --color-marker: var(--marker);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  /* CJK-fallback'и: Golos/Inter Tight не содержат иероглифов. */
+  --font-sans:
+    "Golos Text Variable", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC",
+    system-ui, sans-serif;
+  --font-heading:
+    "Inter Tight Variable", "Golos Text Variable", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "PingFang SC", "Microsoft YaHei", monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+}
+@layer base {
+  * {
+    @apply border-border outline-ring;
+  }
+  /* Всегда резервируем место под вертикальную полосу прокрутки, иначе при
+     переключении вкладок (высокая → низкая) ширина страницы «прыгает». */
+  html {
+    scrollbar-gutter: stable;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings:
+      "ss01" on,
+      "tnum" off;
+  }
+  /* Дисплейная типографика: тяжёлый Inter Tight с плотным трекингом. */
+  .font-display {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  /* Моно-капс лейбл («ВОПРОС», «ИСТОЧНИКИ · 4») — структурный маркер стиля. */
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+/* Всплывающие списки (Select, DropdownMenu и т.п.) всегда поверх лейаута:
+   радикс-портал может получить z-index: auto и проигрывать sticky-панелям */
+[data-radix-popper-content-wrapper] {
+  z-index: 50 !important;
+}
+
+/* Подсветка отвечающих фрагментов в режиме чтения документа.
+   Механика как в валидационных станциях (Kofax/UiPath): полупрозрачная
+   заливка с обводкой; выбранный фрагмент дважды «вспыхивает» тёплым жёлтым,
+   чтобы глаз мгновенно находил место; остальные совпадения кликабельны. */
+.hl-frag {
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--brand) 10%, transparent);
+  outline: 2px solid color-mix(in oklab, var(--brand) 55%, transparent);
+  outline-offset: 1px;
+}
+.hl-frag-flash {
+  animation: hlpulse 1.1s ease-in-out 2;
+}
+@keyframes hlpulse {
+  50% {
+    background: rgba(255, 200, 40, 0.62);
+    outline-color: rgba(217, 152, 0, 0.85);
+  }
+}
+.hl-frag-ctx {
+  cursor: pointer;
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--brand) 6%, transparent);
+  outline: 2px solid color-mix(in oklab, var(--brand) 28%, transparent);
+  outline-offset: 1px;
+  transition:
+    background 0.15s ease,
+    outline-color 0.15s ease;
+}
+.hl-frag-ctx:hover {
+  background: color-mix(in oklab, var(--brand) 12%, transparent);
+  outline-color: color-mix(in oklab, var(--brand) 50%, transparent);
+}
+
+/* Богатый рендер текста гипотез (RichText): Markdown + формулы KaTeX.
+   Скромная типографика под мелкий интерфейсный шрифт; цвет наследуется,
+   поэтому «приглушённые» блоки задаются классом text-muted-foreground. */
+.rich-text {
+  line-height: 1.6;
+}
+.rich-text > :first-child {
+  margin-top: 0;
+}
+.rich-text > :last-child {
+  margin-bottom: 0;
+}
+.rich-text p {
+  margin: 0.5rem 0;
+}
+.rich-text ul,
+.rich-text ol {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+.rich-text ul {
+  list-style: disc;
+}
+.rich-text ol {
+  list-style: decimal;
+}
+.rich-text li {
+  margin: 0.125rem 0;
+}
+.rich-text h1,
+.rich-text h2,
+.rich-text h3,
+.rich-text h4 {
+  margin: 0.75rem 0 0.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.rich-text h1 {
+  font-size: 1.05rem;
+}
+.rich-text h2 {
+  font-size: 1rem;
+}
+.rich-text h3 {
+  font-size: 0.925rem;
+}
+.rich-text a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.rich-text strong {
+  font-weight: 600;
+}
+.rich-text code {
+  font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+  font-size: 0.85em;
+  border-radius: 4px;
+  background: var(--muted);
+  padding: 0.05rem 0.3rem;
+}
+.rich-text pre {
+  margin: 0.5rem 0;
+  overflow-x: auto;
+  border-radius: 6px;
+  background: var(--muted);
+  padding: 0.75rem;
+}
+.rich-text pre code {
+  background: transparent;
+  padding: 0;
+}
+.rich-text blockquote {
+  margin: 0.5rem 0;
+  border-left: 2px solid var(--border);
+  padding-left: 0.75rem;
+  color: var(--muted-foreground);
+}
+.rich-text table {
+  margin: 0.5rem 0;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.rich-text th,
+.rich-text td {
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+}
+.rich-text th {
+  background: var(--muted);
+  font-weight: 600;
+}
+/* Выносные формулы могут быть шире колонки — даём горизонтальную прокрутку. */
+.rich-text .katex-display {
+  margin: 0.75rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Подсветка цитаты в PDF: текстовый слой pdf.js рисует прозрачные буквы поверх
+   страницы, поэтому полупрозрачный фон даёт «маркер», а mix-blend-mode
+   сохраняет читаемость текста под ним. */
+.pdf-hl {
+  border-radius: 2px;
+  background-color: rgb(250 204 21 / 0.45);
+  mix-blend-mode: multiply;
+  animation: pdf-hl-flash 1.1s ease-out 1;
+}
+@keyframes pdf-hl-flash {
+  from {
+    background-color: rgb(250 204 21 / 0.85);
+  }
+  to {
+    background-color: rgb(250 204 21 / 0.45);
+  }
+}

@@ -1,0 +1,37 @@
+[graph]
+all-features = true
+
+[advisories]
+yanked = "deny"
+ignore = [
+  # Transitive via parquet; no safe upgrade path is available yet.
+  "RUSTSEC-2024-0436",
+  # Transitive via ort/ureq during ONNX runtime bootstrap; no safe upgrade path is available yet.
+  "RUSTSEC-2025-0134",
+]
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+highlight = "all"
+
+[licenses]
+confidence-threshold = 0.8
+allow = [
+  "Apache-2.0",
+  "Apache-2.0 WITH LLVM-exception",
+  "MIT",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "ISC",
+  "Unicode-3.0",
+  "Zlib",
+  "BSL-1.0",
+  "CC0-1.0",
+  "CDLA-Permissive-2.0",
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

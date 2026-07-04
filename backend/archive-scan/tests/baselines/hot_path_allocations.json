@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "scenarios": [
+    {
+      "name": "lower_ext.lowercase_extension",
+      "description": "Already lowercase extensions in the archive hot path stay allocation-free.",
+      "max_allocations": 0,
+      "max_reallocations": 0,
+      "max_allocated_bytes": 0,
+      "observed_allocations": 0,
+      "observed_reallocations": 0,
+      "observed_allocated_bytes": 0
+    },
+    {
+      "name": "detect_type.heuristic_uppercase_extension",
+      "description": "Filename/extension heuristics must not allocate when fast_only short-circuits Magika.",
+      "max_allocations": 0,
+      "max_reallocations": 0,
+      "max_allocated_bytes": 0,
+      "observed_allocations": 0,
+      "observed_reallocations": 0,
+      "observed_allocated_bytes": 0
+    },
+    {
+      "name": "scan.analyze_reader_header_only",
+      "description": "Header-only scan on the hot path should avoid heap traffic entirely.",
+      "max_allocations": 0,
+      "max_reallocations": 0,
+      "max_allocated_bytes": 0,
+      "observed_allocations": 0,
+      "observed_reallocations": 0,
+      "observed_allocated_bytes": 0
+    },
+    {
+      "name": "scan.analyze_reader_header_hash",
+      "description": "Header hashing should stay bounded to the single hash-string allocation.",
+      "max_allocations": 1,
+      "max_reallocations": 0,
+      "max_allocated_bytes": 64,
+      "observed_allocations": 1,
+      "observed_reallocations": 0,
+      "observed_allocated_bytes": 64
+    },
+    {
+      "name": "scan.analyze_reader_full_hash",
+      "description": "Full hashing should stay bounded to the two hash-string allocations.",
+      "max_allocations": 2,
+      "max_reallocations": 0,
+      "max_allocated_bytes": 128,
+      "observed_allocations": 2,
+      "observed_reallocations": 0,
+      "observed_allocated_bytes": 128
+    },
+    {
+      "name": "engine.process_archive_without_rows",
+      "description": "Core scan aggregation without row sinks should not regress in heap traffic.",
+      "max_allocations": 8,
+      "max_reallocations": 0,
+      "max_allocated_bytes": 358,
+      "observed_allocations": 8,
+      "observed_reallocations": 0,
+      "observed_allocated_bytes": 358
+    },
+    {
+      "name": "engine.process_archive_with_rows",
+      "description": "Row emission stays within a fixed allocation budget per scanned entry.",
+      "max_allocations": 10,
+      "max_reallocations": 0,
+      "max_allocated_bytes": 393,
+      "observed_allocations": 10,
+      "observed_reallocations": 0,
+      "observed_allocated_bytes": 393
+    },
+    {
+      "name": "serialization.entry_row_ndjson_preallocated",
+      "description": "Serializing an entry row into a preallocated buffer should avoid heap churn.",
+      "max_allocations": 0,
+      "max_reallocations": 0,
+      "max_allocated_bytes": 0,
+      "observed_allocations": 0,
+      "observed_reallocations": 0,
+      "observed_allocated_bytes": 0
+    }
+  ]
+}

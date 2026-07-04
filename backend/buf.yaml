@@ -1,0 +1,21 @@
+# buf configuration for the rag-test protobuf contracts (proto).
+#
+# buf is the checked-in protobuf contract config. Once buf is installed
+# (https://buf.build), the team can run:
+#   buf lint
+#   buf breaking --against '.git#branch=master'   # wire into CI
+# breaking-change detection is the reserved/compat policy enforcer: removing or
+# renumbering a field fails the check, so evolution stays additive.
+version: v2
+modules:
+  - path: proto
+lint:
+  use:
+    - STANDARD
+  except:
+    # Packages share a `rag.` org-namespace prefix (rag.common.v1, rag.db.v1,
+    # rag.llm.v1) by design, so they do not equal the bare directory path.
+    - PACKAGE_DIRECTORY_MATCH
+breaking:
+  use:
+    - FILE

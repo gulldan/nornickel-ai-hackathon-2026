@@ -1,0 +1,117 @@
+{
+  "name": "rag-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "oxlint && bun scripts/check-conventions.ts",
+    "fmt": "oxfmt --ignore-path .oxfmtignore .",
+    "fmt:check": "oxfmt --check --ignore-path .oxfmtignore .",
+    "typecheck": "tsc --noEmit",
+    "typecheck:ts7": "tsgo --noEmit",
+    "test": "bun test src",
+    "knip": "knip",
+    "audit": "bun audit",
+    "size": "size-limit",
+    "e2e": "playwright test",
+    "a11y": "playwright test -g @a11y",
+    "verify": "bun run fmt:check && bun run lint && bun run typecheck && bun run knip && bun run audit && bun run test && bun run build && bun run size"
+  },
+  "dependencies": {
+    "@fontsource-variable/golos-text": "^5.2.8",
+    "@fontsource-variable/inter-tight": "^5.2.7",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "@radix-ui/react-avatar": "^1.2.1",
+    "@radix-ui/react-dialog": "^1.1.18",
+    "@radix-ui/react-dropdown-menu": "^2.1.19",
+    "@radix-ui/react-label": "^2.1.11",
+    "@radix-ui/react-select": "^2.3.2",
+    "@radix-ui/react-separator": "^1.1.11",
+    "@radix-ui/react-slot": "^1.3.0",
+    "@radix-ui/react-switch": "^1.3.2",
+    "@radix-ui/react-tooltip": "^1.2.11",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "docx": "^9.7.1",
+    "framer-motion": "^12.42.2",
+    "i18next": "^26.3.4",
+    "katex": "0.17.0",
+    "lucide-react": "^1.23.0",
+    "pdfjs-dist": "6.1.200",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-i18next": "^17.0.8",
+    "react-markdown": "^10.1.0",
+    "react-pdf": "^10.4.1",
+    "react-router-dom": "^7.18.1",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.61.1",
+    "@size-limit/file": "^12.1.0",
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/bun": "^1.3.14",
+    "@types/node": "^26.1.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@typescript/native-preview": "^7.0.0-dev.20260703.1",
+    "@vitejs/plugin-react": "^6.0.3",
+    "knip": "^6.24.0",
+    "lefthook": "^2.1.9",
+    "oxfmt": "^0.57.0",
+    "oxlint": "^1.72.0",
+    "size-limit": "^12.1.0",
+    "tailwindcss": "^4.3.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.3"
+  },
+  "optionalDependencies": {
+    "@oxc-parser/binding-linux-x64-gnu": "0.137.0"
+  },
+  "overrides": {
+    "katex": "0.17.0",
+    "pdfjs-dist": "6.1.200"
+  },
+  "size-limit": [
+    {
+      "path": "dist/assets/index-*.js",
+      "limit": "20 KB"
+    },
+    {
+      "path": "dist/assets/Input-*.js",
+      "limit": "80 KB"
+    },
+    {
+      "path": "dist/assets/react-vendor-*.js",
+      "limit": "70 KB"
+    },
+    {
+      "path": "dist/assets/radix-*.js",
+      "limit": "38 KB"
+    },
+    {
+      "path": "dist/assets/motion-*.js",
+      "limit": "42 KB"
+    },
+    {
+      "path": "dist/assets/icons-*.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/assets/RichTextInner-*.js",
+      "limit": "130 KB"
+    },
+    {
+      "path": "dist/assets/PdfViewer-*.js",
+      "limit": "120 KB"
+    }
+  ]
+}

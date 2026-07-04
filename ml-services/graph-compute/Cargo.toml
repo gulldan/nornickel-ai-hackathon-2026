@@ -1,0 +1,161 @@
+[package]
+name = "graph_compute"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.96.0"
+description = "Stateless graph/clustering engine: kNN cosine graph + Leiden community detection over Qdrant document vectors"
+license = "MIT"
+readme = "README.md"
+keywords = ["clustering", "leiden", "graph", "qdrant", "rag"]
+categories = ["science", "algorithms"]
+
+[lib]
+name = "graph_compute"
+path = "src/lib.rs"
+
+[[bin]]
+name = "graph_compute_server"
+path = "src/bin/graph_compute_server.rs"
+required-features = ["service"]
+
+[dependencies]
+# типы, сериализация
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = { version = "1.0.150", features = ["preserve_order"] }
+
+# error handling
+anyhow = "1.0.102"
+
+# структуры данных и хэши
+smallvec = { version = "1.15.1", features = ["union"] }
+ahash = "0.8.12"
+sha1 = "0.10.6"
+rayon = "1.12.0"
+
+# текстовые эвристики чанков (порт re-паттернов из cluster-worker)
+regex = "1.12.3"
+
+# детектор сообществ (форк rustworkx, ветка extract-community-core, rev c1ee2832; не трогаем форк)
+rustworkx-core = { git = "https://github.com/gulldan/rustworkx.git", rev = "c1ee28321fdd1d56dce8cc17de7bcb82785d03c6" }
+
+# граф для centrality/shortest-path bridge-скоринга (версия совпадает с rustworkx-core)
+petgraph = "0.8"
+
+# --- service feature only ---
+tokio = { version = "1.52.3", features = ["rt-multi-thread", "macros", "signal", "net"], optional = true }
+axum = { version = "0.8.9", optional = true }
+reqwest = { version = "0.13.4", default-features = false, features = ["json", "rustls"], optional = true }
+tonic = { version = "0.14.6", optional = true }
+tonic-prost = { version = "0.14.6", optional = true }
+prost = { version = "0.14.3", optional = true }
+tracing = { version = "0.1.44", optional = true }
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"], optional = true }
+
+[build-dependencies]
+tonic-prost-build = "0.14.6"
+
+[dev-dependencies]
+stats_alloc = "0.1.10"
+criterion = { version = "0.8.2", default-features = false, features = ["cargo_bench_support", "html_reports"] }
+tower = { version = "0.5.3", features = ["util"] }
+tokio = { version = "1.52.3", features = ["rt-multi-thread", "macros"] }
+
+[[bench]]
+name = "hot_path"
+harness = false
+
+[features]
+default = []
+service = [
+    "dep:tokio",
+    "dep:axum",
+    "dep:reqwest",
+    "dep:tonic",
+    "dep:tonic-prost",
+    "dep:prost",
+    "dep:tracing",
+    "dep:tracing-subscriber",
+]
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+
+[profile.bench]
+inherits = "release"
+debug = 1
+
+[lints.rust]
+unsafe_code = "forbid"
+rust_2018_idioms = { level = "warn", priority = -1 }
+unused_lifetimes = "warn"
+unused_qualifications = "warn"
+unreachable_pub = "warn"
+
+[lints.rustdoc]
+bare_urls = "deny"
+broken_intra_doc_links = "deny"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+correctness = { level = "deny", priority = -1 }
+suspicious = { level = "deny", priority = -1 }
+complexity = { level = "deny", priority = -1 }
+perf = { level = "deny", priority = -1 }
+style = { level = "deny", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+pedantic = { level = "allow", priority = -1 }
+
+dbg_macro = "deny"
+explicit_into_iter_loop = "warn"
+explicit_iter_loop = "warn"
+filter_map_next = "warn"
+flat_map_option = "warn"
+fn_params_excessive_bools = "allow"
+future_not_send = "warn"
+implicit_clone = "warn"
+inefficient_to_string = "warn"
+large_digit_groups = "warn"
+large_futures = "warn"
+large_stack_arrays = "warn"
+manual_assert = "warn"
+manual_instant_elapsed = "warn"
+manual_let_else = "warn"
+match_bool = "warn"
+mem_forget = "warn"
+mutex_atomic = "warn"
+needless_pass_by_value = "allow"
+panic = "allow"
+rc_mutex = "warn"
+readonly_write_lock = "warn"
+redundant_closure_for_method_calls = "warn"
+return_self_not_must_use = "warn"
+same_name_method = "warn"
+semicolon_if_nothing_returned = "warn"
+struct_excessive_bools = "allow"
+todo = "warn"
+too_many_lines = "warn"
+unimplemented = "warn"
+uninlined_format_args = "warn"
+unnecessary_wraps = "warn"
+unused_async = "warn"
+used_underscore_binding = "warn"
+
+await_holding_lock = "deny"
+await_holding_refcell_ref = "deny"
+
+cargo = { level = "allow", priority = -1 }
+restriction = { level = "allow", priority = -1 }
+blanket_clippy_restriction_lints = "allow"
+if_not_else = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+missing_const_for_fn = "allow"
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+option_if_let_else = "allow"
+redundant_pub_crate = "allow"
+similar_names = "allow"

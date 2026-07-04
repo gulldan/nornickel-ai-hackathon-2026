@@ -1,0 +1,418 @@
+{
+  "page": {
+    "loadingHypothesis": "正在加载假设",
+    "loadingDirection": "正在加载研究方向",
+    "errorHypothesis": "无法加载假设",
+    "errorDirection": "无法加载研究方向"
+  },
+  "actions": {
+    "back": "返回",
+    "collapse": "收起",
+    "showFull": "展开全文",
+    "update": "更新",
+    "approve": "确认",
+    "sendToReview": "送审",
+    "reject": "否决",
+    "addComment": "添加评论",
+    "refine": "改进（AI 智能体）",
+    "refining": "改进中…",
+    "statusUpdated": "状态已更新",
+    "statusUpdateFailed": "无法更新状态",
+    "commentAdded": "评论已添加",
+    "commentAddFailed": "无法添加评论"
+  },
+  "verdicts": {
+    "supported": "支持",
+    "refuted": "反驳",
+    "mixed": "部分支持",
+    "insufficient": "数据不足"
+  },
+  "panels": {
+    "ranking": "为何名列前茅",
+    "trl": "技术成熟度",
+    "verification": "知识库核查",
+    "hypothesis": "假设",
+    "materials": "材料学档案",
+    "mechanism": "机理（因果链）",
+    "experiment": "实验方案",
+    "feasibility": "可行性",
+    "evidence": "文献证据",
+    "details": "详细信息",
+    "competitors": "竞争者",
+    "specialties": "学科领域",
+    "expertDecision": "专家决定",
+    "history": "修改历史",
+    "direction": "研究方向",
+    "directionDocuments": "方向相关文献",
+    "context": "背景",
+    "directionScores": "方向评估",
+    "nextStep": "下一步",
+    "sources": "来源",
+    "whatIs": "什么是「{{title}}」"
+  },
+  "hero": {
+    "scientific": "科研型",
+    "owner": "作者：{{name}}",
+    "directionNote": "这是来自知识库的一个有前景的研究方向，而非经过验证的假设。可将其作为深入探索的线索。"
+  },
+  "trl": {
+    "scaleName": "技术成熟度等级 · GOST R 58048-2017",
+    "byLevels": "分级评估",
+    "level": "TRL {{level}}",
+    "autoPending": "技术成熟度自动计算中",
+    "autoDone": "技术成熟度已计算",
+    "autoPendingNote": "系统会自动套用 GOST 等级并更新卡片。",
+    "autoDoneNote": "等级及其依据已就绪，待专家审核。"
+  },
+  "verification": {
+    "confidencePct": "置信度 {{value}}%",
+    "aiNote": "基于知识库的 AI 评估——并非最终科学结论",
+    "queued": "该假设已进入基于知识库的自动核查队列。",
+    "done": "核查已完成",
+    "pending": "核查自动进行中",
+    "doneNote": "结论、支持与反驳证据均已收集。",
+    "pendingNote": "系统会自动收集证据、支持与反驳。",
+    "basedOn": "依据：{{basis}}",
+    "checkFragments_other": "{{count}} 个核查片段",
+    "checkedAt": "核查于 {{date}}"
+  },
+  "confidence": {
+    "unverified": "未验证",
+    "unverifiedNote": "数据不足——以下评分仅供参考，请勿视为假设已被证实。",
+    "fragmentsFor": "支持片段：{{count}}",
+    "fragmentsAgainst": "反驳片段：{{count}}"
+  },
+  "schema": {
+    "incomplete": "假设不完整",
+    "missing": "缺少：{{list}}"
+  },
+  "scoreboard": {
+    "title": "假设评估",
+    "hint": "点击指标查看解读",
+    "details": "评估详情",
+    "noDetail": "该指标暂无解读。",
+    "trl": "成熟度（TRL）",
+    "trlChip": "TRL {{level}}/9",
+    "itc": "技术性",
+    "outOf": "满 {{max}}",
+    "queued": "排队中",
+    "forAgainst": "支持 {{for}} · 反对 {{against}}"
+  },
+  "nav": {
+    "title": "本页导航",
+    "mechanism": "机制"
+  },
+  "materials": {
+    "system": "体系",
+    "composition": "成分",
+    "process": "工艺",
+    "microstructure": "显微组织",
+    "targetProperty": "目标性能",
+    "characterization": "表征",
+    "tests": "测试",
+    "failureRisks": "失效风险"
+  },
+  "ranking": {
+    "priority": "验证优先级",
+    "explainer": "总分由服务按固定权重计算，模型仅从知识库中提取特征。",
+    "factor": "因素",
+    "contribution": "贡献",
+    "weight": "权重",
+    "notScored": "未计入",
+    "expertDecision": "专家决定：{{label}}",
+    "formula": "公式：{{formula}}"
+  },
+  "novelty": {
+    "title": "新颖性",
+    "why": "新颖性评分依据"
+  },
+  "freshness": {
+    "title": "主题新鲜度"
+  },
+  "learning": {
+    "title": "下一步验证什么",
+    "titleHintLabel": "「下一步验证什么」的含义",
+    "titleHint": "验证该假设能在多大程度上推进认知：综合潜在价值、不确定性与数据缺口。分数越高，越值得优先验证。",
+    "breakdown": "构成因素",
+    "value": "潜在价值",
+    "valueHint": "如果假设得到证实，我们能获得什么。",
+    "uncertainty": "不确定性",
+    "uncertaintyHint": "结果尚不明朗的程度——越高，验证时学到的越多。",
+    "evidenceGap": "数据缺口",
+    "evidenceGapHint": "证据基础有多薄弱：数据越少，验证的收益越高。"
+  },
+  "causal": {
+    "step": "步骤",
+    "composition": "成分",
+    "process": "工艺",
+    "microstructure": "显微组织",
+    "property": "性能",
+    "feed": "给矿",
+    "operation": "作业",
+    "regime": "工况",
+    "indicator": "指标",
+    "kpi": "目标"
+  },
+  "experiment": {
+    "taskTitle": "生成实验方案",
+    "taskSuccess": "实验方案已生成",
+    "taskFailed": "无法生成实验方案",
+    "composing": "生成中…",
+    "updatePlan": "更新方案",
+    "createPlan": "生成实验方案",
+    "aiNote": "方案由 AI 基于知识库提出——启动前请先核查",
+    "empty": "尚无方案。请制定方案：材料、工艺参数、测量方法、对照和成功标准——以便在实验室中验证该假设。",
+    "planType": "方案类型：{{type}}",
+    "stagesDetail": "分阶段详情（{{count}}）",
+    "stage": "阶段 {{n}}",
+    "materials": "材料",
+    "variables": "变量",
+    "processParams": "工艺参数",
+    "charMethods": "测量方法",
+    "testMethods": "测试方法",
+    "methods": "方法",
+    "controls": "对照",
+    "successCriterion": "成功标准",
+    "risks": "风险",
+    "costEstimate": "成本估计：{{value}}",
+    "timeEstimate": "时间估计：{{value}}",
+    "cost": {
+      "low": "低",
+      "medium": "中",
+      "high": "高"
+    },
+    "time": {
+      "days": "数天",
+      "weeks": "数周",
+      "months": "数月"
+    },
+    "type": {
+      "new_alloy": "新合金",
+      "process_route": "工艺路线",
+      "coating_corrosion": "涂层与腐蚀",
+      "battery_material": "电池材料",
+      "ore_beneficiation": "选矿",
+      "metallurgy_process": "冶金工艺",
+      "generic": "通用方案"
+    }
+  },
+  "roadmap": {
+    "title": "验证路线图",
+    "cost": "成本：{{value}}",
+    "time": "周期：{{value}}",
+    "materials_other": "{{count}} 种材料",
+    "methods_other": "{{count}} 种方法",
+    "moreCriteria": "另有 {{count}} 条"
+  },
+  "feasibility": {
+    "risk": "风险：{{level}}",
+    "low": "低",
+    "medium": "中",
+    "high": "高"
+  },
+  "evidence": {
+    "role": {
+      "supports": "支持",
+      "contradicts": "反驳",
+      "context": "背景"
+    },
+    "count": {
+      "supports": "支持",
+      "contradicts": "反驳",
+      "context": "背景"
+    },
+    "relationText": {
+      "supports": "该片段包含有利于所述效应的结果或条件。",
+      "contradicts": "该片段指出与所述效应相悖的限制、负面结果或条件。",
+      "context": "该片段提供了验证所需的条件、方法或材料，但本身并不证明该效应。"
+    },
+    "relationRole": {
+      "theme_a": "代表桥接的第一个主题",
+      "theme_b": "代表桥接的第二个主题",
+      "mediator": "连接两个主题的中介文献"
+    },
+    "relationPrefix": "与{{subject}}的关联：",
+    "subjectHypothesis": "假设",
+    "subjectDirection": "研究方向",
+    "numericSignals": "数值信号：{{list}}。",
+    "page": "第 {{page}} 页",
+    "pageRange": "第 {{start}}–{{end}} 页",
+    "empty": "尚未找到证据。",
+    "unnamedDocument": "文档",
+    "documentFallback": "文档",
+    "docsWithFragment_other": "个含引用片段的文档",
+    "fragmentsBare_other": "个片段",
+    "fragments_other": "{{count}} 个片段",
+    "documents_other": "{{count}} 个文档",
+    "sourceDocs_other": "{{count}} 个文档",
+    "openDocTitle": "打开文档并高亮相应位置",
+    "collapseFragments": "收起片段",
+    "expandFragments": "显示片段",
+    "emptyFragment": "无文本片段",
+    "showAll": "显示全部文章（{{count}}）",
+    "fromInput": "来自您的数据",
+    "filterHint": "仅显示这些文档",
+    "filterReset": "显示全部"
+  },
+  "competitors": {
+    "taskTitle": "竞争者分析",
+    "found": "找到竞争者：{{count}}",
+    "noneFound": "知识库中未找到竞争者",
+    "taskFailed": "无法完成竞争者分析",
+    "analyzing": "分析中…",
+    "findInBase": "在知识库中查找",
+    "strengths": "优势",
+    "weaknesses": "劣势",
+    "notFound": "知识库中未找到竞争者。",
+    "notStarted": "尚未启动分析。"
+  },
+  "refine": {
+    "taskTitle": "改进假设",
+    "taskSuccess": "假设已检查并在必要处完善",
+    "taskFailed": "无法改进假设"
+  },
+  "tags": {
+    "taskTitle": "自动为假设打标签",
+    "taskSuccess": "标签与研究类型已确定",
+    "taskFailed": "无法确定标签",
+    "determining": "识别中…",
+    "determine": "识别",
+    "aiNote": "标签由 AI 基于知识库确定",
+    "empty": "学科领域（GRNTI / VAK / Scopus）尚未确定。"
+  },
+  "fields": {
+    "rationale": "依据",
+    "problem": "研究问题",
+    "drivers": "效率驱动因素",
+    "driversShort": "驱动因素",
+    "applicationPotential": "应用潜力",
+    "application": "应用",
+    "areas": "领域",
+    "howToVerify": "如何验证",
+    "metrics": "指标：{{list}}",
+    "quantParams": "定量参数",
+    "whyHighlighted": "入选原因"
+  },
+  "expert": {
+    "commentPlaceholder": "专家评论…",
+    "summaryApproved": "已获专家确认",
+    "summaryReview": "已送审",
+    "summaryRejected": "已被专家否决"
+  },
+  "history": {
+    "system": "系统"
+  },
+  "direction": {
+    "taskTitle": "生成假设",
+    "taskDescription": "研究方向：{{title}}",
+    "created": "已创建假设：{{count}}",
+    "taskFailed": "无法生成假设",
+    "updatedAt": "更新于 {{date}}",
+    "noDescription": "该研究方向尚无描述。",
+    "aiNote": "这是来自知识库的探索领域，可验证的假设将在单独步骤中生成。",
+    "generate": "生成假设",
+    "generating": "生成中...",
+    "itcTitle": "方向技术指数",
+    "itcCitations": "方向内引用",
+    "sourcesSummary": "{{fragments}}，来自{{documents}}。"
+  },
+  "scores": {
+    "value": "潜力",
+    "novelty": "新颖性",
+    "risk": "风险"
+  },
+  "itc": {
+    "title": "技术指数",
+    "whatIs": "什么是技术指数",
+    "badge": "技术指数 {{score}}/10",
+    "ringTitle": "技术指数 {{score}}/10 · {{band}}",
+    "outOf10": "满分 10",
+    "comp": {
+      "SM": "科研活跃度",
+      "NV": "新颖性",
+      "IP": "影响力",
+      "HR": "成熟度"
+    },
+    "citationsHypotheses": "假设中的引用",
+    "computedPrefix": "基于知识库计算：",
+    "pubYears": "发表于 {{span}}",
+    "pubCount_other": "{{count}} 篇文献",
+    "deterministic": "确定性计算，不含 AI 评估"
+  },
+  "provenance": {
+    "title": "假设由来",
+    "fallback": "模型不可用——草稿由检索到的片段直接拼装，未经生成。",
+    "bridgeIntro": "系统发现了一座「桥」：知识库中的两个主题语义相近却几乎没有直接联系——于是在它们的交汇处提出了这一假设。",
+    "themeA": "主题 A",
+    "themeB": "主题 B",
+    "mediators": "中介文献 · {{count}}",
+    "openMediator": "打开中介文献",
+    "scaleValue": "{{label}}：{{value}}/100",
+    "scales": {
+      "maverick": "关联的意外程度",
+      "maverickHint": "主题语义相近却几乎没有直接联系——非显而易见想法的标志",
+      "bridging": "中介强度",
+      "bridgingHint": "中介文献在多大程度上真正连接了两个主题",
+      "affinity": "主题语义相近度",
+      "affinityHint": "两个主题在多大程度上谈的是同一件事"
+    },
+    "convergenceLabel": "收敛性：",
+    "convergencePaths_other": "条主题间的独立路径",
+    "gatesTitle": "发布前核查",
+    "gateConvergence_other": "关联经 {{shown}} 条独立路径证实",
+    "gateRequired": "（需 ≥{{required}}）",
+    "gateGrounding": "所有证据均引用知识库中的真实文献",
+    "gateNovelty": "不与已知内容重复",
+    "noveltySimBefore": "：最相近文本相似度为",
+    "noveltyThreshold": "（阈值 {{value}} %）",
+    "openNearest": "打开最相近的文献",
+    "wording": "表述模型：{{model}}",
+    "clusterWithLabel": "由主题「{{label}}」自动生成——用于探察有前景的领域，并非经过验证的论断。",
+    "clusterNoLabel": "由知识库主题自动生成——用于探察有前景的领域，并非经过验证的论断。",
+    "onDemand": "依据目标从知识库片段生成：系统检索相关文献、提取机理并组装出可验证的论断。",
+    "constraints": "已考虑的约束：",
+    "model": "模型：{{model}}",
+    "worldPractice": "世界实践（公开文献）"
+  },
+  "edit": {
+    "open": "编辑",
+    "dialogTitle": "编辑假设",
+    "dialogDescription": "更改将记录在修订历史中。",
+    "title": "标题",
+    "statement": "陈述",
+    "rationale": "论证",
+    "cancel": "取消",
+    "save": "保存",
+    "saved": "假设已更新",
+    "saveFailed": "保存失败",
+    "revisionSummary": "专家文本编辑"
+  },
+  "roadmapEdit": {
+    "open": "编辑",
+    "dialogTitle": "编辑路线图",
+    "dialogDescription": "阶段、成功标准和资源评估。更改将记录在修订历史中。",
+    "stage": "阶段 {{n}}",
+    "stageTitle": "阶段名称",
+    "stagePurpose": "阶段目标",
+    "stageItems": "操作/资源——每行一个",
+    "addStage": "添加阶段",
+    "removeStage": "删除阶段",
+    "criteria": "成功标准（每行一个）",
+    "criteriaPlaceholder": "例如：耐热性至少提高 15%",
+    "cost": "成本",
+    "time": "周期",
+    "cancel": "取消",
+    "save": "保存",
+    "saved": "路线图已更新",
+    "saveFailed": "保存失败",
+    "revisionSummary": "专家路线图编辑"
+  },
+  "export": {
+    "menu": "导出",
+    "word": "Word 报告（DOCX）",
+    "pdf": "打印报告（PDF）",
+    "loading": "正在生成 Word 报告…",
+    "ready": "Word 报告已下载",
+    "error": "无法生成 Word 文件"
+  }
+}

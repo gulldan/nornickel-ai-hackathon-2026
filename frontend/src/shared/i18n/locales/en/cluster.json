@@ -1,0 +1,40 @@
+{
+  "back": "Back",
+  "loading": "Loading topic",
+  "errorNotFound": "Topic not found",
+  "errorLoad": "Failed to load topic",
+  "untitled": "Untitled topic",
+  "kicker": "Topic",
+  "meta": {
+    "documents_one": "{{count}} document",
+    "documents_other": "{{count}} documents",
+    "fragments_one": "{{count}} fragment",
+    "fragments_other": "{{count}} fragments",
+    "updated": "updated {{date}}"
+  },
+  "density": {
+    "label": "Topic density",
+    "hint": "How semantically close the topic's documents are to each other: the denser, the more uniform the topic. Computed from document vectors, with no AI involved.",
+    "bar": "Density {{percent}} %"
+  },
+  "lineage": {
+    "merged": "The topic was formed by merging {{count}} previous topics during the last knowledge-base update",
+    "split": "The topic split off from a larger topic during a knowledge-base update",
+    "unchanged": "The topic's composition has not changed since the last knowledge-base update",
+    "continues": "The topic continues a previous one: composition matches by {{percent}} %"
+  },
+  "itc": {
+    "title": "Topic technology index",
+    "citations": "citations in the topic"
+  },
+  "docsSection": "Topic documents",
+  "generate": "Generate hypotheses for the topic",
+  "generating": "Generating…",
+  "task": {
+    "title": "Hypothesis generation",
+    "theme": "Topic: {{label}}",
+    "success": "Topic “{{label}}”: {{count}} created",
+    "error": "Failed to generate hypotheses",
+    "fallbackLabel": "topic"
+  }
+}

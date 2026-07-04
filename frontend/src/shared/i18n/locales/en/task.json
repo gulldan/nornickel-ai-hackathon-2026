@@ -1,0 +1,33 @@
+{
+  "jobs": {
+    "generate": "Hypothesis generation",
+    "verify": "Auto-verification against the knowledge base",
+    "enrich": "Hypothesis enrichment",
+    "assess_trl": "Automatic TRL assessment",
+    "competitors": "Competitor analysis",
+    "refine": "Hypothesis refinement",
+    "tag": "Hypothesis classification",
+    "fallback": "Hypothesis task"
+  },
+  "workers": {
+    "clusters": "Topics: document grouping",
+    "discovery": "Bridges between topics",
+    "raptor": "Document summaries",
+    "itc": "Technology index",
+    "eval": "Answer quality check"
+  },
+  "toasts": {
+    "done": "Task completed",
+    "failed": "Failed to complete the task"
+  },
+  "notifications": {
+    "bellAria": "Background tasks: {{count}}",
+    "bellAriaIdle": "Notifications",
+    "title": "Notifications",
+    "inProgress": "{{count}} in progress",
+    "system": "System",
+    "allDone": "All background computations are finished — the knowledge base is up to date.",
+    "empty": "No background tasks yet.",
+    "clearFinished": "Clear finished"
+  }
+}

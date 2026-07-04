@@ -1,0 +1,367 @@
+{
+  "noData": "暂无数据",
+  "loading": "加载中…",
+  "actions": {
+    "save": "保存",
+    "saving": "保存中…",
+    "resetToDefaults": "恢复默认",
+    "cancel": "取消",
+    "refresh": "刷新"
+  },
+  "units": {
+    "mln": "百万",
+    "thousand": "千",
+    "ms": "毫秒",
+    "s": "秒",
+    "pcs": "个",
+    "sec": "秒",
+    "percent": "%",
+    "docs": "篇",
+    "chunks": "段"
+  },
+  "dashboard": {
+    "title": "概览",
+    "description": "知识库状态：文档、索引与容量",
+    "loadingAria": "正在加载分析数据",
+    "loadError": "无法加载分析数据——请检查网络连接后重试。",
+    "fileTypes": {
+      "pdf": "PDF",
+      "docx": "Word",
+      "eml": "邮件",
+      "xlsx": "Excel",
+      "pptx": "幻灯片",
+      "txt": "文本",
+      "image": "扫描件",
+      "db": "数据库",
+      "other": "其他"
+    },
+    "metrics": {
+      "total": "文档总数",
+      "totalSub": "已上传到知识库",
+      "indexed": "已索引",
+      "indexedSub": "占全部文档的 {{pct}}%",
+      "processing": "处理中",
+      "processingSub": "从上传到索引",
+      "failed": "错误",
+      "failedSub": "处理失败",
+      "chunks": "片段总数",
+      "chunksSub": "索引中的文本片段",
+      "size": "容量",
+      "sizeSub": "存储中的源文件"
+    },
+    "factory": {
+      "title": "工厂的产出",
+      "themes": "主题",
+      "themesSub": "自动聚合的相似文档组",
+      "hypotheses": "假设",
+      "hypothesesSub": "带证据和评分的可验证想法",
+      "goals": "目标",
+      "goalsSub": "假设所围绕的指标"
+    },
+    "empty": {
+      "title": "暂无文档",
+      "description": "上传首批文档到知识库后将显示分析数据。"
+    },
+    "dynamics": {
+      "title": "知识库动态",
+      "uploadsByDay": "每日上传 · {{days}} 天",
+      "pipeline": "处理流水线",
+      "pipelineAria": "完成 {{indexed}}，进行中 {{processing}}，错误 {{failed}}",
+      "indexedReady_other": "篇文档可供搜索",
+      "processingNow": "正在处理",
+      "failedRetry": "处理出错——可重新上传",
+      "byType": "按文件类型",
+      "topDocs": "按片段数排名前 10 的文档"
+    }
+  },
+  "users": {
+    "title": "用户与角色",
+    "description": "拥有搜索、策展和管理权限的账户",
+    "create": "创建用户",
+    "searchPlaceholder": "用户名",
+    "searchAria": "搜索用户",
+    "loadingAria": "正在加载用户",
+    "loadError": "无法加载用户——请检查网络连接后重试。",
+    "table": {
+      "user": "用户",
+      "roles": "角色",
+      "created": "创建时间"
+    },
+    "notFound": "未找到用户",
+    "roles": {
+      "user": "用户",
+      "operator": "操作员",
+      "admin": "管理员"
+    },
+    "dialog": {
+      "title": "新用户",
+      "description": "账户即刻生效——请将登录名和密码交给员工",
+      "username": "用户名",
+      "password": "密码",
+      "passwordHint_other": "至少 {{count}} 个字符",
+      "role": "角色",
+      "submit": "创建",
+      "submitting": "创建中…"
+    },
+    "toasts": {
+      "created": "用户“{{username}}”已创建",
+      "exists": "用户“{{username}}”已存在",
+      "createFailed": "无法创建用户：{{message}}",
+      "network": "网络不可用"
+    }
+  },
+  "settings": {
+    "title": "系统设置",
+    "description": "这里汇集了保存在服务器上的所有参数：平台参数（AI 模型、互联网文献搜索）、排序权重和假设工厂的工作阈值。",
+    "tabs": {
+      "model": "AI 模型",
+      "generation": "生成",
+      "ranking": "排序"
+    },
+    "tabHints": {
+      "model": "由哪个模型回答问题并生成假设：Yandex、OpenRouter 或自建服务器。切换对所有用户生效，几秒内应用，无需重启。",
+      "generation": "左侧——全局参数：互联网文献搜索与生成模式。右侧——假设工厂的工作阈值与限制。",
+      "ranking": "透明排序权重：假设最终得分的构成。"
+    }
+  },
+  "weights": {
+    "title": "假设排序权重",
+    "hintLabel": "什么是排序权重",
+    "hintBody": "假设的优先级由六个带权重的因素构成。提高对您重要的因素——假设将重新排序。保存时权重会归一化为总和 100%。",
+    "description": "“最值得验证”排序中哪些因素更重要。总和会归一化为 100%。",
+    "share": "· 占比 {{share}}%",
+    "total": "当前总和：{{total}}%——保存时归一化为 100%。",
+    "atLeastOne": "至少要有一个权重大于零",
+    "saved": "权重已保存——假设将重新排序",
+    "saveFailed": "无法保存权重",
+    "fields": {
+      "kpi_fit": {
+        "label": "目标契合度",
+        "hint": "假设与所选目标的契合程度"
+      },
+      "evidence": {
+        "label": "证据基础",
+        "hint": "在文档中找到的佐证数量"
+      },
+      "novelty": {
+        "label": "新颖性",
+        "hint": "想法相对于知识库的新鲜程度"
+      },
+      "value": {
+        "label": "价值",
+        "hint": "假设得到证实后的预期效果"
+      },
+      "risk_inv": {
+        "label": "风险可控性",
+        "hint": "风险越低，贡献越高"
+      },
+      "trl_fit": {
+        "label": "技术成熟度",
+        "hint": "按 TRL 1–9 等级的成熟度"
+      }
+    }
+  },
+  "runtime": {
+    "title": "假设工厂参数",
+    "hintLabel": "参数的作用范围",
+    "hintBody": "这些值控制假设看板、快捷队列、从目标、主题和方向生成假设，以及从知识图谱推导方向。",
+    "description": "无需改代码即可调整的工作阈值与限制。",
+    "generation": "生成",
+    "queues": "“就绪”与“风险”队列",
+    "queuesHint": "就绪 = 验证证实假设 + TRL ≥ {{trl}} + 评分 ≥ {{score}}%。风险 = 验证予以反驳、结论不一、卡片已关闭或风险 ≥ {{risk}}%。",
+    "domain": "领域限制",
+    "excluded": "排除方向",
+    "excludedPlaceholder": "例如：含钴配方；压力超过 200 MPa 的技术",
+    "excludedHint": "工厂不会在这些方向提出假设——对该所有者的所有生成生效。",
+    "deepTitle": "深度LLM后处理",
+    "deepHint": "保存前增加评审、单独的新颖性评估和来源立场；为快速 MVP 已关闭。",
+    "serverLimit": "当前服务器端生成上限：1–{{max}}。看板加载上限保持系统默认，以免标签计数与数据不一致。",
+    "loadFailed": "无法加载工厂参数",
+    "saved": "工厂参数已保存",
+    "saveFailed": "无法保存工厂参数",
+    "resetDone": "工厂参数已重置",
+    "resetFailed": "无法重置工厂参数",
+    "fields": {
+      "defaultGenerateCount": {
+        "label": "每个目标的假设数",
+        "hint": "“目标”页面上“生成”按钮创建的数量"
+      },
+      "clusterGenerateCount": {
+        "label": "每个主题的假设数",
+        "hint": "主题页面上按钮创建的数量"
+      },
+      "directionGenerateCount": {
+        "label": "每个方向的假设数",
+        "hint": "方向页面上按钮创建的数量"
+      },
+      "generationTimeoutSec": {
+        "label": "生成超时",
+        "hint": "等待模型回复多久后报告错误"
+      },
+      "graphDirectionLimit": {
+        "label": "图谱方向数",
+        "hint": "“目标”页面面板显示的建议数量"
+      },
+      "readyTrlMin": {
+        "label": "就绪：最低 TRL",
+        "hint": "技术成熟度达到该值时假设进入“就绪”队列"
+      },
+      "readyScoreMin": {
+        "label": "就绪：最低评分",
+        "hint": "进入“就绪”队列的最低综合评分"
+      },
+      "riskScoreMin": {
+        "label": "风险：风险阈值",
+        "hint": "风险达到该值时假设进入“风险”队列"
+      }
+    }
+  },
+  "metrics": {
+    "kicker": "工厂可观测性",
+    "title": "指标",
+    "description": "工厂的两面：LLM 用量与服务商预算，以及流水线各阶段的实时延迟。",
+    "viewAria": "指标板块",
+    "viewBudget": "预算与消耗",
+    "viewPerf": "性能",
+    "usage": {
+      "title": "LLM 预算与消耗",
+      "pendingDescription": "按操作统计的 LLM 请求、token 与费用——工厂开始计算后即会显示。",
+      "noData": "暂无消耗数据。",
+      "rangeDescription": "{{provider}} · 近 {{days}} 天",
+      "periodAria": "周期",
+      "days7": "7天",
+      "days30": "30天",
+      "requestsToday": "今日请求",
+      "requestsTodaySub": "上限 {{limit}} · 每分钟 {{perMinUsed}}/{{perMinLimit}}",
+      "tokensForRange": "周期内 token 数",
+      "requestsCount_other": "{{formatted}} 次请求",
+      "cost": "费用",
+      "modelsCount_other": "{{count}} 个模型",
+      "credits": "预算余额",
+      "creditsSub": "共 {{total}} · 已用 {{used}}",
+      "providerFallback": "LLM",
+      "estimatedNote": "按价目表估算",
+      "byProviderTitle": "按服务商消耗",
+      "providerSub": "{{tokens}} token · {{formatted}} 次请求",
+      "kind": {
+        "real": "真实",
+        "notional": "名义 · 主办方密钥",
+        "free": "免费"
+      },
+      "free": "免费",
+      "rubRateNote": "≈ 按 {{rate}} ₽/$ 折算",
+      "requestsByDay": "每日请求",
+      "tokensByDay": "每日 token",
+      "chartMetricAria": "图表指标",
+      "chartRequests": "请求",
+      "chartTokens": "token",
+      "byOperation": "按操作",
+      "byModel": "按模型",
+      "perHypothesis": "一条假设 ≈",
+      "perHypothesisValue": "{{requests}} 次请求 · {{tokens}} token · {{cost}}",
+      "composedOf": "由以下组成：",
+      "averagedOver_other": "按周期内 {{formatted}} 条假设平均",
+      "budgetUnset": "未设置预算（LLM_BUDGET_TOTAL）",
+      "noQuota": "无每日配额 · 服务商仅限制并发数"
+    },
+    "trace": {
+      "title": "延迟与各阶段——时间花在哪里",
+      "description": "来自 Prometheus 的真实流量各阶段延迟（p50 / p95），按路径顺序排列。最深色的条即瓶颈。",
+      "empty": "暂无延迟测量数据。文档和查询经过流水线后将显示各阶段。",
+      "ingestPath": "文档路径——从上传到索引",
+      "queryPath": "查询路径——从提问到回答",
+      "stages": {
+        "upload": "文件接收 → S3 → 记录 → 发布",
+        "parseArchive": "解压归档（ZIP/RAR/7z）",
+        "parsePdf": "PDF 文本提取",
+        "parseOffice": "Office 解析（doc/xls/txt）",
+        "parseEmail": "邮件解析（eml）",
+        "parseOcr": "扫描件 OCR（PaddleOCR-VL）",
+        "chunkSplit": "分块（拆分为片段）",
+        "chunkEmbed": "片段向量化（F2LLM-v2）",
+        "chunkIndex": "索引（Qdrant + OpenSearch）",
+        "embed": "查询向量化（F2LLM-v2）",
+        "retrieveVector": "向量检索（Qdrant）",
+        "retrieveLexical": "词法检索（BM25 / OpenSearch）",
+        "rerank": "重排序（cross-encoder）",
+        "generate": "答案生成（LLM）"
+      }
+    },
+    "jobs": {
+      "title": "假设任务——完整耗时",
+      "description": "过去 24 小时内任务从启动到出结果的完整耗时。验证“数分钟内产出首批假设”的要求。",
+      "tasksCount_other": "{{formatted}} 个任务",
+      "median": "中位数",
+      "max": "最大值",
+      "last24h": "近24小时"
+    },
+    "workers": {
+      "title": "后台工厂",
+      "description": "后台计算延迟——来自工作进程状态；交互路径——见上方 Prometheus 数据。",
+      "run": "运行 {{duration}}",
+      "updated": "更新于 {{time}}",
+      "neverRan": "尚未运行"
+    }
+  },
+  "system": {
+    "title": "通用生成参数",
+    "description": "对所有用户生效，几秒内自动加载。",
+    "llm": "生成所用的 AI 模型",
+    "provider": "提供方",
+    "providerDefault": "按部署配置",
+    "providerOpenRouter": "OpenRouter",
+    "providerCustom": "自定义地址",
+    "url": "服务器地址",
+    "model": "模型",
+    "modelHint": "提供方的模型名称；留空表示按部署配置。",
+    "apiKey": "API 密钥",
+    "apiKeySet": "已设置密钥——输入新值以替换",
+    "apiKeyUnset": "未设置",
+    "pubsearch": "互联网文献",
+    "pubsearchEnabled": "生成假设时搜索科学文献",
+    "pubsearchEnabledHint": "OpenAlex 与 Crossref 为“世界实践”部分挑选文章。离线环境请关闭。",
+    "mailto": "OpenAlex 邮箱",
+    "mailtoHint": "提供邮箱可加快 OpenAlex 响应；否则仅使用 Crossref。",
+    "generation": "假设生成",
+    "genBreadth": "广度优先生成",
+    "genBreadthHint": "先产出更多简短想法，细节在第二步补全。",
+    "kpiSuggest": "从语料库推荐目标",
+    "kpiSuggestHint": "生成页面上的“推荐目标”按钮。",
+    "qualityFloor": "卡片质量下限",
+    "qualityFloorHint": "0–1：结构不完整的卡片将被归档。",
+    "applyNote": "更改约 5 秒内生效。清空字段即恢复部署配置的值。",
+    "saved": "已保存——几秒内生效",
+    "loadFailed": "加载参数失败",
+    "saveFailed": "保存失败",
+    "source": {
+      "db": "在面板中修改",
+      "env": "来自部署配置",
+      "default": "默认",
+      "draft": "未保存"
+    },
+    "llmDesc": "撰写回答和假设所用的提供方与模型。密钥保存在服务器端，不会回显。",
+    "cost": {
+      "title": "费用核算",
+      "desc": "「指标」页 LLM 消耗计算所用的汇率与价目表。",
+      "rubRate": "USD→RUB 汇率",
+      "rubRateHint": "用于统一卢布合计：OpenRouter 的真实美元按此换算为 ₽。",
+      "rubRateUnit": "₽/$",
+      "currency": "估算货币",
+      "currencyHint": "用于无 usage.cost 的服务商（Yandex）。OpenRouter 始终为 $。",
+      "prices": "每百万 token 价格",
+      "pricesHint": "substr=输入/输出，以「;」分隔。示例：yandexgpt=800/800（0.80 ₽/1K）。"
+    },
+    "providerYandex": "Yandex",
+    "providerStub": "占位（无模型）",
+    "urlHint": "OpenAI 兼容服务器：vLLM、llama.cpp 等。留空——按部署配置。",
+    "apiKeyHint": "OpenRouter 和 Yandex 需要；本地服务器通常不需要。",
+    "statusNow": "当前：",
+    "statusKeySet": "已设置密钥",
+    "statusKeyMissing": "未设置密钥",
+    "backToDeployment": "恢复部署默认值",
+    "unsaved": "有未保存的更改——将对所有用户生效。",
+    "statProvider": "提供方",
+    "statModel": "模型",
+    "statKey": "API 密钥"
+  }
+}

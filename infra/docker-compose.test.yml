@@ -1,0 +1,29 @@
+# Ephemeral backends for integration coverage and CI. Tests that cannot be
+# faked in-process — db-service's PostgreSQL repositories (DB_TEST_DSN) and the
+# platform messaging broker paths (RABBITMQ_TEST_URL) — connect here. Host ports
+# are offset by +1 from the dev stack so this can run alongside `make up`.
+name: rag-test-infra
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: test-postgres-password
+      POSTGRES_DB: rag
+    ports: ["5433:5432"]
+    tmpfs: ["/var/lib/postgresql"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d rag"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    ports: ["5673:5672"]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 3s
+      timeout: 5s
+      retries: 30

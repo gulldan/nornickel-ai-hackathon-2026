@@ -1,0 +1,104 @@
+{
+  "actions": {
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "retry": "Retry",
+    "reset": "Reset",
+    "resetToDefaults": "Defaults",
+    "copy": "Copy",
+    "download": "Download",
+    "export": "Export",
+    "open": "Open",
+    "refresh": "Refresh"
+  },
+  "states": {
+    "loading": "Loading…",
+    "empty": "Nothing here yet",
+    "notRated": "not rated",
+    "dash": "—"
+  },
+  "units": {
+    "bytes": "B",
+    "kb": "KB",
+    "mb": "MB",
+    "gb": "GB",
+    "tb": "TB"
+  },
+  "counts": {
+    "documents_one": "{{count}} document",
+    "documents_other": "{{count}} documents",
+    "hypotheses_one": "{{count}} hypothesis",
+    "hypotheses_other": "{{count}} hypotheses",
+    "tasks_one": "{{count}} task",
+    "tasks_other": "{{count}} tasks"
+  },
+  "ui": {
+    "hint": "Hint",
+    "loading": "Loading",
+    "somethingWentWrong": "Something went wrong",
+    "aiNote": "AI estimate from the knowledge base — not a final conclusion",
+    "ofTotal": "{{value}} of {{total}}",
+    "pagination": {
+      "label": "Pages",
+      "prev": "Previous page",
+      "next": "Next page"
+    },
+    "evidence": {
+      "notVerified": "Not yet verified against the knowledge base",
+      "for": "for",
+      "against": "against",
+      "mentions": "mentions",
+      "hint": "How many found fragments support the hypothesis, contradict it, or merely mention the topic without a direct conclusion."
+    }
+  },
+  "fileTypes": {
+    "pdf": "PDF",
+    "docx": "Word",
+    "eml": "Email",
+    "xlsx": "Excel",
+    "pptx": "Slides",
+    "txt": "Text",
+    "image": "Scan",
+    "db": "Database",
+    "other": "File"
+  },
+  "errorPages": {
+    "toHome": "Go home",
+    "notFound": {
+      "code": "Error 404",
+      "title": "Page not found",
+      "description": "The page does not exist or has been moved. Check the address or return to the home page."
+    },
+    "forbidden": {
+      "code": "Error 403",
+      "title": "Insufficient permissions",
+      "description": "This section is available to a different role. If you need access, contact the administrator."
+    },
+    "serverError": {
+      "code": "Error 500",
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. We already know about the problem — try refreshing the page."
+    }
+  },
+  "glossary": {
+    "goal": "A goal is a production task: what to improve and which indicator measures it (for example, “cut Ni losses in tailings to 8%”). The system selects and checks hypotheses for each goal.",
+    "theme": "A topic is a group of similar documents from the knowledge base that the system assembles automatically. Topics are the \"raw material\" from which hypotheses are born for your goal.",
+    "hypothesis": "A hypothesis is a testable idea proposed by the system for your goal: with a rationale, a readiness assessment and links to sources from the knowledge base.",
+    "landscape": "The topic map shows every topic of the knowledge base in one picture: where there is more novelty and maturity, which topics are larger. It helps you see the whole picture and pick where to dig.",
+    "trl": "Technology readiness (TRL) is a maturity scale from 1 to 9: 1 — just an idea, 9 — a finished, field-proven solution. Assessed per GOST R 58048-2017.",
+    "itc": "The technology index is an assessment of a direction's potential from 1 to 10. Computed automatically from the knowledge base: how many works exist on the topic, how new they are and how influential. The higher, the more mature and visible the direction.",
+    "verify": "Verification against the knowledge base: the system searches the uploaded documents for passages that support or contradict the hypothesis and issues a verdict. This is an AI assessment based on the available sources, not a final scientific conclusion.",
+    "specialties": "Scientific specialties per official classifiers: GRNTI (the scientific-technical information rubricator), VAK (dissertation specialties) and Scopus/ASJC (the international classification). They help understand which field a hypothesis belongs to.",
+    "ranking": "Why the hypothesis is at the top: the final rating is computed not by a model but by a transparent formula of six factors (KPI fit, evidence base, novelty, value, risk manageability, readiness). The LLM only extracts features — the weights and the total can be changed.",
+    "cmpp": "A cause-and-effect chain: how a controllable factor leads to the target indicator. For materials — composition → process → microstructure → property → KPI. It shows the domain logic, not just text.",
+    "experiment": "An experiment plan: what to vary, which characterization and testing methods to verify with, and what the measurable success criterion is. It makes the hypothesis testable in the lab.",
+    "feasibility": "A feasibility check: a sober assessment across aspects — science, scaling, safety/ecology, supply chain — with a risk level. It filters out obviously unrealizable ideas."
+  },
+  "errors": {
+    "sessionExpired": "session expired — sign in again",
+    "jobFailed": "The task failed"
+  }
+}

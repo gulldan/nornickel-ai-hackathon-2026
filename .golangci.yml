@@ -1,0 +1,273 @@
+version: "2"
+
+## Golden config for golangci-lint v2.12.2
+#
+# This is the best config for golangci-lint based on my experience and opinion.
+# It is very strict, but not extremely strict.
+# Feel free to adapt and change it for your needs.
+
+run:
+  # Timeout for analysis, e.g. 30s, 5m.
+  # Default: 1m
+  timeout: 3m
+
+linters:
+  # Linters settings are nested under linters.settings
+  settings:
+    lll:
+      line-length: 130
+    cyclop:
+      max-complexity: 30
+      package-average: 15.0
+    errcheck:
+      check-type-assertions: true
+    exhaustive:
+      # A switch/map with a default case is treated as exhaustive: handlers that
+      # intentionally act on a few enum values and ignore the rest (e.g. switching
+      # on specific HTML tags) are idiomatic and need not enumerate every value.
+      default-signifies-exhaustive: true
+      check:
+        - switch
+        - map
+    exhaustruct:
+      exclude:
+        - "^net/http.Client$"
+        - "^net/http.Cookie$"
+        - "^net/http.Request$"
+        - "^net/http.Response$"
+        - "^net/http.Server$"
+        - "^net/http.Transport$"
+        - "^net/url.URL$"
+        - "^os/exec.Cmd$"
+        - "^reflect.StructField$"
+        - "^github.com/Shopify/sarama.Config$"
+        - "^github.com/Shopify/sarama.ProducerMessage$"
+        - "^github.com/mitchellh/mapstructure.DecoderConfig$"
+        - "^github.com/prometheus/client_golang/.+Opts$"
+        - "^github.com/spf13/cobra.Command$"
+        - "^github.com/spf13/cobra.CompletionOptions$"
+        - "^github.com/stretchr/testify/mock.Mock$"
+        - "^github.com/testcontainers/testcontainers-go.+Request$"
+        - "^github.com/testcontainers/testcontainers-go.FromDockerfile$"
+        - "^golang.org/x/tools/go/analysis.Analyzer$"
+        - "^google.golang.org/protobuf/.+Options$"
+        - "^gopkg.in/yaml.v3.Node$"
+        # Generated protobuf message types (same rationale as protobuf Options
+        # above): constructing them with partial field sets is idiomatic.
+        - ".+/genproto/.+"
+        - "^google.golang.org/grpc/.+"
+        # Third-party option/message structs this project constructs partially —
+        # same category as the sarama/cobra/testcontainers excludes above.
+        - "^github.com/rabbitmq/amqp091-go.Publishing$"
+        - "^github.com/aws/aws-sdk-go-v2/.+"
+        - "^github.com/redis/go-redis/v9.Options$"
+        - "^github.com/gorilla/websocket.Upgrader$"
+    funlen:
+      lines: 100
+      statements: 100
+      ignore-comments: true
+    gocognit:
+      min-complexity: 20
+    gocritic:
+      settings:
+        captLocal:
+          paramsOnly: false
+        underef:
+          skipRecvDeref: false
+    gomodguard_v2:
+      blocked:
+        - module: github.com/golang/protobuf
+          recommendations:
+            - google.golang.org/protobuf
+          reason: "see https://developers.google.com/protocol-buffers/docs/reference/go/faq#modules"
+        - module: github.com/satori/go.uuid
+          recommendations:
+            - github.com/google/uuid
+          reason: "satori's package is not maintained"
+        - module: github.com/gofrs/uuid
+          recommendations:
+            - github.com/google/uuid
+          reason: "gofrs' package is not go module"
+        - module: github.com/minio/minio-go
+          recommendations:
+            - github.com/aws/aws-sdk-go-v2/service/s3
+          reason: "minio client is banned; use the official AWS SDK for Go v2"
+    gosec:
+      excludes:
+        # G107: every internal REST client (Qdrant/OpenSearch/AI engines) targets
+        # an operator-configured URL from env, not user-tainted input.
+        - G107
+        # G704: the taint-analysis SSRF flag on those same operator-configured
+        # URLs (e.g. VLLM_URL for the OpenRouter credit check) — same trust
+        # boundary as G107: the base URL is set by the operator, not a user.
+        - G704
+        # G115: high-false-positive int conversions (e.g. len()->int32 for proto
+        # fields) where the magnitudes are bounded by construction.
+        - G115
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment # too strict
+      settings:
+        shadow:
+          strict: false
+    nakedret:
+      max-func-lines: 0
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+    rowserrcheck:
+      packages:
+        - github.com/jmoiron/sqlx
+        - github.com/jackc/pgx/v4 # Note: consider updating to v5 if applicable
+        - github.com/ClickHouse/clickhouse-go/v2
+        - github.com/ClickHouse/clickhouse-go/v2/lib/driver
+    # usetesting: # Setting 'all: true' was problematic, might need different V2 config or is default
+    wrapcheck:
+      # wrapcheck exists to wrap errors crossing an EXTERNAL boundary. Errors
+      # that stay inside this project are wrapped at the external edge already,
+      # so re-wrapping them at every internal hop adds noise, not signal.
+      ignore-package-globs:
+        - github.com/example/**
+        # gRPC errors carry status codes; wrapping them with %w hides the code
+        # from status.FromError, so they are translated (not wrapped) at the edge.
+        - google.golang.org/grpc/**
+    #   ignoreSigs:
+    #     - .Errorf(
+    #     - errors.New(
+    #     - errors.Unwrap(
+    #     - errors.Join(
+    #     - .Wrap(
+    #     - .Wrapf(
+    #     - .WithMessage(
+    #     - .WithMessagef(
+    #     - .WithStack(
+    #     - status.Error(
+
+  # List of enabled linters
+  enable:
+    ## enabled by default
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck # Includes stylecheck, gosimple now
+    - unused
+    ## disabled by default
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - cyclop
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - dupl
+    - dupword
+    - dogsled
+    - durationcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exptostd
+    - fatcontext
+    - copyloopvar
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godoclint
+    - godot
+    # - godot
+    - gomodguard_v2
+    - gomoddirectives
+    - goprintffuncname
+    - gosec
+    - intrange
+    - iotamixing
+    - lll
+    - loggercheck
+    - makezero
+    - mirror
+    - misspell
+    # - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - noctx
+    - nolintlint
+    # - nonamedreturns
+    - nosprintfhostport
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - sqlclosecheck
+    - testableexamples
+    - tagalign
+    - thelper
+    - tparallel
+    - unconvert
+    - unqueryvet
+    - unparam
+    - usestdlibvars
+    - usetesting
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    # - gci # Enable gci linter itself if needed
+
+  # Exclusions configuration under linters.exclusions
+  exclusions:
+    generated: strict
+    warn-unused: true
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - funlen
+          - cyclop
+          - gocognit
+          - goconst
+          - gocyclo
+          - dupl
+          - nakedret
+          - gosec
+          - gochecknoglobals
+          - wrapcheck
+          - usetesting
+
+# Top-level formatters section
+formatters:
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - blank
+        - dot
+        - alias
+      custom-order: true
+  exclusions:
+    generated: disable # Disable running formatters on generated files
+
+issues:
+  # Issue management settings
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  # exclude: # Rules for excluding specific error texts go here
+  #   - ...

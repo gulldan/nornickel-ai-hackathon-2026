@@ -1,0 +1,952 @@
+# Single-host local stack for the RAG platform. In production this is split across
+# SERVER 1 (compute) and SERVER 2 (storage); here everything runs on one machine.
+#
+# Neural-network backends that are part of the product path live as compose
+# services. Generation/VLM can still point at external OpenAI-compatible
+# endpoints through VLLM_URL/VLM_ENGINE_URL.
+#
+#   docker compose -f infra/docker-compose.yml up -d --build
+#   docker compose -f infra/docker-compose.yml up -d --build --scale ocr-service=2 --scale pdf-parser=3
+#
+# Requires ~8 GB RAM for Docker (OpenSearch is the heavyweight). On Linux you may
+# need: sudo sysctl -w vm.max_map_count=262144
+
+name: rag-platform
+
+# ---- reusable fragments -------------------------------------------------------
+x-app: &app
+  restart: unless-stopped
+  networks: [ragnet]
+  # Потолки ресурсов (короткая форма — надёжно применяется docker compose v2,
+  # deploy.* для этого не нужен и его restart_policy/replicas всё равно swarm-only).
+  # Щедрые: цель — ограничить радиус разгона/утечки на общем хосте, не душить.
+  # Тяжёлые (opensearch/qdrant/GPU) поднимают mem/cpu явными ключами в своих
+  # блоках — явный service-ключ бьёт merge `<<:`.
+  mem_limit: 2g
+  mem_reservation: 128m
+  cpus: "4"
+  pids_limit: 2048
+
+x-env: &env
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  HTTP_ADDR: ":8080"
+  METRICS_ADDR: ":9090"
+  WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+  GRPC_ADDR: ":9091"
+  RABBITMQ_URL: amqp://${RABBITMQ_USER:-rag}:${RABBITMQ_PASSWORD:?set RABBITMQ_PASSWORD in infra/.env}@rabbitmq:5672/
+  POSTGRES_DSN: postgres://rag:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in infra/.env}@postgres:5432/rag?sslmode=disable
+  DB_SERVICE_ADDR: db-service:9091
+  # llm и db нарочно на РАЗНЫХ портах: при пересоздании контейнеров чужой
+  # сервис, занявший старый IP, отвечает connection refused — gRPC-клиент
+  # передоговаривается с честным DNS вместо вечного Unimplemented.
+  LLM_SERVICE_ADDR: llm-service:9092
+  VALKEY_ADDR: valkey:6379
+  VALKEY_PASSWORD: ""
+  S3_ENDPOINT: http://localstack:4566
+  S3_REGION: us-east-1
+  S3_ACCESS_KEY: ${S3_ACCESS_KEY:?set S3_ACCESS_KEY in infra/.env}
+  S3_SECRET_KEY: ${S3_SECRET_KEY:?set S3_SECRET_KEY in infra/.env}
+  S3_BUCKET: documents
+  S3_USE_PATH_STYLE: "true"
+  S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:4566}
+  QDRANT_URL: http://qdrant:6333
+  QDRANT_COLLECTION: documents
+  PROM_URL: http://prometheus:9090
+  OPENSEARCH_URL: http://opensearch:9200
+  OPENSEARCH_INDEX: chunks
+  EMBEDDING_DIM: ${EMBEDDING_DIM:-1024}
+  CHUNK_SIZE: "1000"
+  CHUNK_OVERLAP: "150"
+  # --- Interactive-vs-batch QoS (см. llm-service admission + chunk-splitter pacer) ---
+  RAG_SHARED_CORPUS: ${RAG_SHARED_CORPUS:-true}
+  # Abstain threshold on the top reranker score (kills RAG fail-open). The local
+  # reranker returns a calibrated 0..1 relevance score; 0.5 is the default
+  # decision boundary. Only enforced when RERANKER_URL is set (the stub scorer
+  # uses a different scale). Re-tune via eval-service after a model swap.
+  RAG_SCORE_FLOOR: ${RAG_SCORE_FLOOR:-0.5}
+  RAG_MAX_CONCURRENT: ${RAG_MAX_CONCURRENT:-16}
+  RAG_QUEUE_WAIT: ${RAG_QUEUE_WAIT:-10s}
+  RAG_GENERATE_TIMEOUT: ${RAG_GENERATE_TIMEOUT:-150s}
+  INGEST_YIELD_MAX_WAIT: ${INGEST_YIELD_MAX_WAIT:-2s}
+  EMBED_BATCH: ${EMBED_BATCH:-64}
+  JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in infra/.env}
+  JWT_ISSUER: rag-platform
+  REGISTRATION_ADMIN_ONLY: ${REGISTRATION_ADMIN_ONLY:-true}
+  TIKA_URL: http://tika:9998
+  WORKBOOK_PARSER_URL: ${WORKBOOK_PARSER_URL:-http://workbook-parser-service:8095}
+  # --- Neural network endpoints. EMPTY only for optional external engines. ---
+  EMBEDDINGS_URL: ${EMBEDDINGS_URL:-http://f2llm-service:8085/v1/embeddings}
+  EMBEDDINGS_MODEL: ${EMBEDDINGS_MODEL:-codefuse-ai/F2LLM-v2-0.6B}
+  IMAGE_PARSE_ROUTE: ${IMAGE_PARSE_ROUTE:-ocr}
+  LLM_PRICES: ${LLM_PRICES:-}
+  # Классификация строки model в провайдера для разбивки расхода на дашборде:
+  # "substr=key:label:currency:kind;…", kind ∈ real|notional|free. Пусто — дефолты
+  # стенда: yandexgpt/gpt:// → Yandex (условный, ключ организаторов, ₽), реальный
+  # usage.cost → OpenRouter ($), прочее → локальная модель (бесплатно).
+  LLM_PROVIDERS: ${LLM_PROVIDERS:-}
+  LLM_DAILY_LIMIT: ${LLM_DAILY_LIMIT:-0}
+  LLM_PER_MIN_LIMIT: ${LLM_PER_MIN_LIMIT:-0}
+  VLLM_URL: ${VLLM_URL:-}
+  VLLM_MODEL: ${VLLM_MODEL:-qwen3-35b-a3b}
+  # Bearer token for a hosted OpenAI-compatible gateway (e.g. OpenRouter). Empty
+  # for a keyless local engine. For OpenRouter: VLLM_URL=https://openrouter.ai/api.
+  # Fully local: `--profile local-llm` + VLLM_URL=http://llama-server:8090 (см. llama-server ниже).
+  VLLM_API_KEY: ${VLLM_API_KEY:-}
+  VLLM_RPM: ${VLLM_RPM:-18}
+  # Учёт затрат LLM (дашборд «Метрики»): прайс за 1 млн токенов + валюта + общий
+  # бюджет для провайдеров без usage.cost (Yandex AI Studio). Читает main-service.
+  # Пример прайса Yandex: LLM_PRICES="yandexgpt=800/800" (0.80 ₽/1K = 800/1M;
+  # 5 Lite → 200/200). OpenRouter прайсить не нужно — он отдаёт реальный usage.cost.
+  LLM_PRICE_PROMPT_PER_1M: ${LLM_PRICE_PROMPT_PER_1M:-}
+  LLM_PRICE_COMPLETION_PER_1M: ${LLM_PRICE_COMPLETION_PER_1M:-}
+  LLM_COST_CURRENCY: ${LLM_COST_CURRENCY:-$$}
+  # Курс USD→RUB для единого рублёвого итога расхода (реальный $ OpenRouter → ₽).
+  LLM_RUB_PER_USD: ${LLM_RUB_PER_USD:-90}
+  LLM_BUDGET_TOTAL: ${LLM_BUDGET_TOTAL:-}
+  RERANKER_URL: ${RERANKER_URL:-http://reranker-service:8086/v1/rerank}
+  RERANKER_MODEL: ${RERANKER_MODEL:-Qwen/Qwen3-Reranker-0.6B}
+  OCR_ENGINE_URL: ${OCR_ENGINE_URL:-http://paddleocr-vl-service:8088}
+  OCR_MODEL: ${OCR_MODEL:-PaddleOCR-VL}
+  VLM_ENGINE_URL: ${VLM_ENGINE_URL:-}
+  VLM_MODEL: ${VLM_MODEL:-qwen3.5-9b}
+  VLM_API_STYLE: ${VLM_API_STYLE:-native}
+  VLM_API_KEY: ${VLM_API_KEY:-}
+  # Поиск публикаций (OpenAlex/Crossref) для «мировой практики» в гипотезах.
+  # OPENALEX_API_KEY — серверный секрет (не отдаётся на фронт); при его наличии
+  # OpenAlex вызывается по api_key. PUBSEARCH_MAILTO — опциональный polite-pool.
+  OPENALEX_API_KEY: ${OPENALEX_API_KEY:-}
+  PUBSEARCH_MAILTO: ${PUBSEARCH_MAILTO:-}
+  PUBSEARCH_ENABLED: ${PUBSEARCH_ENABLED:-true}
+  PUBSEARCH_RECENT_YEARS: ${PUBSEARCH_RECENT_YEARS:-5}
+
+services:
+  # ---------------- infrastructure (SERVER 2 in prod) ----------------
+  postgres:
+    image: postgres:18-alpine
+    <<: *app
+    environment:
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in infra/.env}
+      POSTGRES_DB: rag
+    # PG18+ Docker images store data in a version-specific subdirectory and
+    # refuse to start if the volume is mounted at /var/lib/postgresql/data —
+    # mount the PARENT instead. See docker-library/postgres#1259.
+    volumes: [pgdata:/var/lib/postgresql]
+    # Internal-only (no host port) to avoid clashing with a local Postgres.
+    # Reach it with: docker compose exec postgres psql -U rag
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d rag"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    <<: *app
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-rag}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?set RABBITMQ_PASSWORD in infra/.env}
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/conf.d/20-platform.conf:ro
+    ports: ["127.0.0.1:${RABBITMQ_UI_PORT:-15672}:15672"] # management UI only; AMQP stays internal
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+
+  valkey:
+    image: valkey/valkey:9-alpine
+    <<: *app
+    command: ["valkey-server", "--save", "60", "1"]
+    volumes: [valkeydata:/data]
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  # S3-compatible object store for local dev. Keep the service name `localstack`
+  # so existing S3_ENDPOINT/S3_PUBLIC_ENDPOINT values remain stable. The previous
+  # LocalStack Community backend kept S3 object bytes in ephemeral process state,
+  # so Postgres could outlive S3 objects after a container recreate. SeaweedFS is
+  # disk-backed here: master, volume and filer state all live under /data.
+  localstack:
+    image: ${SEAWEEDFS_IMAGE:-chrislusf/seaweedfs:latest}
+    <<: *app
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        cat >/tmp/seaweedfs-s3.json <<EOF
+        {
+          "identities": [
+            {
+              "name": "rag-dev-admin",
+              "credentials": [
+                {
+                  "accessKey": "$${S3_ACCESS_KEY}",
+                  "secretKey": "$${S3_SECRET_KEY}"
+                }
+              ],
+              "actions": ["Admin", "Read", "List", "Tagging", "Write"]
+            }
+          ]
+        }
+        EOF
+        exec weed server \
+          -ip=localstack \
+          -ip.bind=0.0.0.0 \
+          -dir=/data \
+          -master.port=9333 \
+          -master.volumePreallocate=false \
+          -volume.port=8080 \
+          -volume.max=32 \
+          -volume.fileSizeLimitMB=2048 \
+          -filer \
+          -filer.port=8888 \
+          -s3 \
+          -s3.port=4566 \
+          -s3.ip.bind=0.0.0.0 \
+          -s3.port.iceberg=0 \
+          -s3.config=/tmp/seaweedfs-s3.json \
+          -s3.iam=false \
+          -s3.allowedOrigins='*'
+    environment:
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:?set S3_ACCESS_KEY in infra/.env}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:?set S3_SECRET_KEY in infra/.env}
+    volumes:
+      - seaweedfsdata:/data
+      - ./seaweedfs/filer.toml:/etc/seaweedfs/filer.toml:ro
+    # S3 опубликован на хост: браузер кладёт части больших файлов НАПРЯМУЮ по
+    # presigned-ссылкам (подписаны S3_PUBLIC_ENDPOINT), мимо nginx и его лимитов.
+    ports: ["127.0.0.1:${S3_PORT:-4566}:4566"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9333/cluster/status >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  qdrant:
+    image: qdrant/qdrant:v1.18.2
+    <<: *app
+    mem_limit: 4g
+    cpus: "8"
+    volumes: [qdrantdata:/qdrant/storage] # internal-only
+
+  opensearch:
+    image: opensearchproject/opensearch:3.7.0
+    <<: *app
+    mem_limit: 4g
+    cpus: "8"
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      bootstrap.memory_lock: "true"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile: { soft: 65536, hard: 65536 }
+    volumes: [osdata:/usr/share/opensearch/data] # internal-only
+
+  tika:
+    image: apache/tika:3.3.1.0-full
+    <<: *app # internal-only: parsers reach it at http://tika:9998
+
+  # ---------------- neural backends ----------------
+  # Embeddings for indexing, retrieval, evaluation and ITC.
+  f2llm-service:
+    <<: *app
+    mem_limit: 8g
+    cpus: "16"
+    build: { context: ../ml-services/f2llm-service }
+    # Use the explicit NVIDIA runtime instead of Compose's `gpus: all`.
+    # On this host Docker's `--gpus all` path creates /dev/nvidia-uvm with the
+    # wrong major number, so nvidia-smi works but torch.cuda initialization fails.
+    runtime: nvidia
+    environment:
+      F2LLM_MODEL: ${F2LLM_MODEL:-codefuse-ai/F2LLM-v2-0.6B}
+      F2LLM_MAX_TOKENS: ${F2LLM_MAX_TOKENS:-512}
+      TORCH_DEVICE: ${F2LLM_TORCH_DEVICE:-cuda}
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-all}
+      HF_HOME: /models/huggingface
+    volumes:
+      - ../models/huggingface:/models/huggingface
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8085/health', timeout=3)\"",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 60
+      start_period: 30s
+
+  # Cross-encoder reranker for RAG candidate scoring. The default model is
+  # Qwen3-Reranker, but the service is model-configurable via RERANKER_* envs.
+  reranker-service:
+    <<: *app
+    mem_limit: 8g
+    cpus: "16"
+    build: { context: ../ml-services/reranker-service }
+    runtime: nvidia
+    environment:
+      RERANKER_MODEL: ${RERANKER_SERVICE_MODEL:-Qwen/Qwen3-Reranker-0.6B}
+      RERANKER_MAX_TOKENS: ${RERANKER_MAX_TOKENS:-4096}
+      RERANKER_BATCH: ${RERANKER_BATCH:-8}
+      TORCH_DEVICE: ${RERANKER_TORCH_DEVICE:-cuda}
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-all}
+      HF_HOME: /models/huggingface
+    volumes:
+      - ../models/huggingface:/models/huggingface
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8086/health', timeout=3)\"",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 60
+      start_period: 30s
+
+  # Structural OCR engine — the SOLE OCR engine. PaddleOCR-VL is a 0.9B
+  # vision-language document parser (Apache-2.0) that recovers layout, reading
+  # order, tables and formulas as Markdown and has a measured Cyrillic/Russian
+  # eval, chosen in the OCR analysis for better structure on RU+EN scientific PDFs.
+  # ⚠ Russian quality / model load are not yet validated on this hardware — verify
+  # on first run. Weights download to /root/.paddlex on first start (mounted
+  # volume); the shared HuggingFace cache mirrors the other neural backends.
+  paddleocr-vl-service:
+    <<: *app
+    mem_limit: 8g
+    cpus: "16"
+    build: { context: ../ml-services/paddleocr-vl-service }
+    runtime: nvidia
+    environment:
+      PADDLEOCR_VL_DEVICE: ${PADDLEOCR_VL_DEVICE:-gpu}
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-all}
+      HF_HOME: /models/huggingface
+    volumes:
+      - ../models/huggingface:/models/huggingface
+      - ../models/paddlex:/root/.paddlex
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8088/health', timeout=3)\"",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 60
+      start_period: 60s
+
+  # Полностью локальная генерация (llama.cpp, OpenAI-совместимый /v1/chat/completions).
+  # Опциональный профиль: docker compose --profile local-llm up -d llama-server,
+  # затем VLLM_URL=http://llama-server:8090 (без /v1 — клиент дописывает путь сам)
+  # и пустой VLLM_API_KEY. GGUF-модель кладётся в ${LLAMA_GGUF_DIR}.
+  # -b/-ub 8192 обязательны: с дефолтным batch 512 длинные ingestion/RAG-запросы
+  # получают 500 от сервера.
+  llama-server:
+    <<: *app
+    mem_limit: 8g
+    cpus: "16"
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    profiles: ["local-llm"]
+    runtime: nvidia
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-all}
+    volumes:
+      - ${LLAMA_GGUF_DIR:-../models/gguf}:/models
+    command:
+      - -m
+      - /models/${LLAMA_GGUF_MODEL:-Qwen3-30B-A3B-Q4_K_M.gguf}
+      - --alias
+      - ${VLLM_MODEL:-qwen3-35b-a3b}
+      - -c
+      - "32768"
+      - -b
+      - "8192"
+      - -ub
+      - "8192"
+      - -ngl
+      - ${LLAMA_NGL:-999}
+      - --reasoning-budget
+      - "0"
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8090"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 60
+      start_period: 120s
+
+  # Распаковка архивов (Rust + libarchive): zip/tar/7z/rar и т.д. Извлекает
+  # файлы НАПРЯМУЮ в S3 (prefix extracted/), метаданные возвращает в ответе —
+  # archive-worker регистрирует их документами. FAST_ONLY: типизация быстрой
+  # эвристикой без ONNX-инференса (mime затем уточняется конвейером).
+  archive-scan:
+    <<: *app
+    build: { context: ../backend/archive-scan }
+    environment:
+      ARCHIVE_SCAN_SERVICE_ADDR: 0.0.0.0:3000
+      ARCHIVE_SCAN_LOG: info
+      ARCHIVE_SCAN_FAST_ONLY: "1"
+      ARCHIVE_SCAN_EXTRACT_STORE_BACKEND: s3
+      ARCHIVE_SCAN_EXTRACT_STORE_S3_ENDPOINT: http://localstack:4566
+      ARCHIVE_SCAN_EXTRACT_STORE_S3_REGION: us-east-1
+      ARCHIVE_SCAN_EXTRACT_STORE_S3_BUCKET: documents
+      ARCHIVE_SCAN_EXTRACT_STORE_S3_KEY_PREFIX: extracted
+      ARCHIVE_SCAN_EXTRACT_STORE_S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY:?set S3_ACCESS_KEY in infra/.env}
+      ARCHIVE_SCAN_EXTRACT_STORE_S3_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:?set S3_SECRET_KEY in infra/.env}
+      ARCHIVE_SCAN_EXTRACT_STORE_S3_PATH_STYLE: "1"
+      ARCHIVE_SCAN_EXTRACT_METADATA_BACKEND: none
+      # Потолок размера ОДНОГО архива: 150 ГиБ по ТЗ. Распаковка буферизует
+      # архив во временный файл — контейнеру нужен соразмерный диск.
+      ARCHIVE_SCAN_OBJECT_SOURCE_MAX_BYTES: ${ARCHIVE_MAX_BYTES:-161061273600}
+    depends_on:
+      localstack: { condition: service_healthy }
+
+  archive-worker:
+    <<: *app
+    build: { context: ../backend/archive-worker }
+    environment:
+      <<: *env
+      ARCHIVE_SCAN_URL: http://archive-scan:3000
+      ARCHIVE_HTTP_TIMEOUT: ${ARCHIVE_HTTP_TIMEOUT:-2h}
+      ARCHIVE_MAX_ENTRIES: ${ARCHIVE_MAX_ENTRIES:-50000}
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      localstack: { condition: service_healthy }
+      db-service: { condition: service_started }
+      archive-scan: { condition: service_started }
+
+  # ---------------- edge ----------------
+  # Auto-clustering: re-clusters the corpus when ingestion settles (debounced on
+  # graph-compute: stateless Rust kNN + Leiden engine over Qdrant vectors.
+  # cluster-worker (and the future Go discovery-worker) call it via gRPC :9093.
+  # rustworkx-core fork is a pinned git dep; build context is the repo root so
+  # build.rs can compile backend/proto/ (see ml-services/graph-compute/Dockerfile).
+  graph-compute:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: ml-services/graph-compute/Dockerfile
+    environment:
+      <<: *env
+      GRPC_ADDR: ":9093"
+    depends_on:
+      qdrant: { condition: service_started }
+
+  # the Valkey corpus epoch), reusing Qdrant vectors so no re-embedding is needed.
+  # Themes and baseline hypotheses refresh hands-free after uploads.
+  cluster-worker:
+    <<: *app
+    build: { context: ../ml-services/cluster-worker }
+    environment:
+      <<: *env
+      RAG_GW: http://nginx/api/v1
+      VALKEY_URL: redis://valkey:6379
+      RAG_USER: ${ADMIN_USERNAME:-admin}
+      RAG_PASS: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in infra/.env}
+      EPOCH_KEY: ${CLUSTER_EPOCH_KEY:-rag:corpus_epoch:shared}
+      LAST_CLUSTERED_KEY: ${LAST_CLUSTERED_KEY:-rag:clusters:last_epoch}
+      ITC_TRIGGER_KEY: ${ITC_TRIGGER_KEY:-rag:itc:trigger}
+      CHECK_INTERVAL: ${CLUSTER_CHECK_INTERVAL:-15}
+      DEBOUNCE_SEC: ${CLUSTER_DEBOUNCE_SEC:-45}
+      KNN_K: ${CLUSTER_KNN_K:-6}
+      KNN_BLOCK_SIZE: ${CLUSTER_KNN_BLOCK_SIZE:-512}
+      RESOLUTION: ${CLUSTER_RESOLUTION:-1.0}
+      MIN_SIZE: ${CLUSTER_MIN_SIZE:-2}
+      SIM_THRESHOLD: ${CLUSTER_SIM_THRESHOLD:-0.0}
+      MUTUAL_KNN: ${CLUSTER_MUTUAL_KNN:-true}
+      CHUNK_WEIGHTING: ${CLUSTER_CHUNK_WEIGHTING:-true}
+      CHUNK_LEAD_COUNT: ${CLUSTER_CHUNK_LEAD_COUNT:-2}
+      CHUNK_W_LEAD: ${CLUSTER_CHUNK_W_LEAD:-2.0}
+      CHUNK_W_RESULTS: ${CLUSTER_CHUNK_W_RESULTS:-1.5}
+      CHUNK_W_REFS: ${CLUSTER_CHUNK_W_REFS:-0.05}
+      LINEAGE_OVERLAP_MIN: ${CLUSTER_LINEAGE_OVERLAP_MIN:-0.3}
+      # kNN + Leiden now run in graph-compute (gRPC); these knobs are forwarded.
+      GRAPH_COMPUTE_ADDR: graph-compute:9093
+      GRAPH_COMPUTE_TIMEOUT: ${GRAPH_COMPUTE_TIMEOUT:-600}
+      AUTO_HYPOTHESES: ${AUTO_HYPOTHESES:-true}
+      AUTO_HYPOTHESIS_LIMIT: ${AUTO_HYPOTHESIS_LIMIT:-24}
+      # Set CLUSTER_AUTORUN=false to keep the worker alive but stop automatic
+      # re-clustering + LLM theme relabelling on every corpus-epoch move (default
+      # true preserves the previous behaviour).
+      CLUSTER_AUTORUN: ${CLUSTER_AUTORUN:-true}
+      # Theme labels are generated by the LLM (VLLM_* inherited from x-env);
+      # when VLLM_URL is empty the worker falls back to keyword labels built from
+      # the cluster's own documents. VLLM_RPM throttles labelling during bulk
+      # reindexing so it never floods the generation backend.
+      VLLM_RPM: ${CLUSTER_VLLM_RPM:-12}
+    depends_on:
+      valkey: { condition: service_healthy }
+      qdrant: { condition: service_started }
+      nginx: { condition: service_started }
+      graph-compute: { condition: service_started }
+
+  # discovery-worker: DISCOVERY_MODE=transfer (default) carries a strong hypothesis
+  # from a KPI onto a semantically close, under-covered KPI (embeds KPIs via f2llm,
+  # no graph-compute); DISCOVERY_MODE=bridge is the legacy graph-compute theme-bridge
+  # path. Both are gated by an anti-hype validation layer (grounding + not-a-duplicate
+  # + corpus-grounded SciMON novelty; bridge adds a convergence floor). Unlike
+  # cluster-worker it NEEDS a generation LLM — it idles when VLLM_URL is empty
+  # (VLLM_*/EMBEDDINGS_* inherited from x-env).
+  discovery-worker:
+    <<: *app
+    build: { context: ../ml-services/discovery-worker }
+    environment:
+      <<: *env
+      RAG_GW: http://nginx/api/v1
+      VALKEY_URL: redis://valkey:6379
+      RAG_USER: ${ADMIN_USERNAME:-admin}
+      RAG_PASS: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in infra/.env}
+      GRAPH_COMPUTE_ADDR: graph-compute:9093
+      GRAPH_COMPUTE_TIMEOUT: ${GRAPH_COMPUTE_TIMEOUT:-600}
+      EPOCH_KEY: ${CLUSTER_EPOCH_KEY:-rag:corpus_epoch:shared}
+      LAST_KEY: ${DISCOVERY_LAST_KEY:-rag:discovery:last_epoch}
+      CHECK_INTERVAL: ${DISCOVERY_CHECK_INTERVAL:-15}
+      DEBOUNCE_SEC: ${DISCOVERY_DEBOUNCE_SEC:-45}
+      # Same cluster knobs as cluster-worker so graph-compute reproduces the same
+      # Leiden communities — bridges then resolve back to the board's clusters.
+      KNN_K: ${CLUSTER_KNN_K:-6}
+      KNN_BLOCK_SIZE: ${CLUSTER_KNN_BLOCK_SIZE:-512}
+      RESOLUTION: ${CLUSTER_RESOLUTION:-1.0}
+      MIN_SIZE: ${CLUSTER_MIN_SIZE:-2}
+      SIM_THRESHOLD: ${CLUSTER_SIM_THRESHOLD:-0.0}
+      MUTUAL_KNN: ${CLUSTER_MUTUAL_KNN:-true}
+      BRIDGE_TOP_N: ${BRIDGE_TOP_N:-50}
+      BRIDGE_MIN_AFFINITY: ${BRIDGE_MIN_AFFINITY:-0.15}
+      BRIDGE_MIN_CONVERGENCE: ${BRIDGE_MIN_CONVERGENCE:-2}
+      BRIDGE_MAX_MEDIATORS: ${BRIDGE_MAX_MEDIATORS:-3}
+      DISCOVERY_LIMIT: ${DISCOVERY_LIMIT:-24}
+      NOVELTY_MAX_SIM: ${NOVELTY_MAX_SIM:-0.92}
+      AUTO_DISCOVERY: ${AUTO_DISCOVERY:-true}
+      # Transfer discovery (default). "bridge" restores the legacy graph path.
+      DISCOVERY_MODE: ${DISCOVERY_MODE:-transfer}
+      TRANSFER_MIN_SIM: ${TRANSFER_MIN_SIM:-0.55}
+      TRANSFER_PER_PAIR: ${TRANSFER_PER_PAIR:-2}
+      TRANSFER_COVERAGE_FULL: ${TRANSFER_COVERAGE_FULL:-5}
+    depends_on:
+      valkey: { condition: service_healthy }
+      qdrant: { condition: service_started }
+      nginx: { condition: service_started }
+      graph-compute: { condition: service_started }
+
+  # raptor-worker: builds the RAPTOR summary layer (Фаза 2) over the raw chunks.
+  # Reuses graph-compute's kNN+Leiden (granularity=chunk) to cluster chunk vectors,
+  # summarises each cluster with the LLM, embeds the summary (F2LLM) and upserts it
+  # as a node_type=raptor_summary point into the SAME Qdrant collection so retrieval
+  # can pick the right altitude. Like discovery-worker it NEEDS a generation LLM and
+  # idles when VLLM_URL is empty (VLLM_*/EMBEDDINGS_* inherited from x-env).
+  raptor-worker:
+    <<: *app
+    build: { context: ../ml-services/raptor-worker }
+    environment:
+      <<: *env
+      RAG_GW: http://nginx/api/v1
+      VALKEY_URL: redis://valkey:6379
+      RAG_USER: ${ADMIN_USERNAME:-admin}
+      RAG_PASS: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in infra/.env}
+      GRAPH_COMPUTE_ADDR: graph-compute:9093
+      GRAPH_COMPUTE_TIMEOUT: ${RAPTOR_GRAPH_COMPUTE_TIMEOUT:-3600}
+      EPOCH_KEY: ${CLUSTER_EPOCH_KEY:-rag:corpus_epoch:shared}
+      RAPTOR_LAST_KEY: ${RAPTOR_LAST_KEY:-rag:raptor:last_epoch}
+      CHECK_INTERVAL: ${RAPTOR_CHECK_INTERVAL:-15}
+      DEBOUNCE_SEC: ${RAPTOR_DEBOUNCE_SEC:-30}
+      # Chunk-graph knobs (same as cluster-worker so the raw chunk graph matches).
+      KNN_K: ${CLUSTER_KNN_K:-6}
+      KNN_BLOCK_SIZE: ${CLUSTER_KNN_BLOCK_SIZE:-512}
+      RESOLUTION: ${CLUSTER_RESOLUTION:-1.0}
+      MIN_SIZE: ${CLUSTER_MIN_SIZE:-2}
+      SIM_THRESHOLD: ${CLUSTER_SIM_THRESHOLD:-0.0}
+      MUTUAL_KNN: ${CLUSTER_MUTUAL_KNN:-true}
+      # RAPTOR shape: how many summary levels and how many members per summary.
+      RAPTOR_MAX_LEVEL: ${RAPTOR_MAX_LEVEL:-2}
+      RAPTOR_MAX_MEMBERS_FOR_SUMMARY: ${RAPTOR_MAX_MEMBERS_FOR_SUMMARY:-24}
+      RAPTOR_SUMMARY_MEMBERS: ${RAPTOR_SUMMARY_MEMBERS:-8}
+      RAPTOR_INPROC_MAX_NODES: ${RAPTOR_INPROC_MAX_NODES:-1500}
+      RAPTOR_MODE: ${RAPTOR_MODE:-incremental}
+      RAPTOR_INCREMENTAL_BATCH: ${RAPTOR_INCREMENTAL_BATCH:-32}
+      RAPTOR_INCREMENTAL_WORKERS: ${RAPTOR_INCREMENTAL_WORKERS:-6}
+      RAPTOR_DOC_MAX_CHUNKS: ${RAPTOR_DOC_MAX_CHUNKS:-16}
+      RAPTOR_SUMMARY_MAX_TOKENS: ${RAPTOR_SUMMARY_MAX_TOKENS:-220}
+      GRPC_MAX_RECV_MB: ${GRPC_MAX_RECV_MB:-128}
+      AUTO_RAPTOR: ${AUTO_RAPTOR:-true}
+    depends_on:
+      valkey: { condition: service_healthy }
+      qdrant: { condition: service_started }
+      nginx: { condition: service_started }
+      graph-compute: { condition: service_started }
+
+  nginx:
+    image: nginx:1.31.2-alpine
+    <<: *app
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports: ["127.0.0.1:${HTTP_PORT:-8080}:80"]
+    depends_on:
+      auth: { condition: service_healthy }
+      main-service: { condition: service_healthy }
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://127.0.0.1/healthz >/dev/null",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  # Browser UI. Serves the built SPA and proxies /api (including WebSocket
+  # upgrades) to the backend gateway so the browser sees one origin.
+  frontend:
+    <<: *app
+    build:
+      context: ../frontend
+      args:
+        RAG_API: ${FRONTEND_BUILD_API:-http://nginx}
+        RAG_PUBLIC_API: ${FRONTEND_PUBLIC_API:-}
+    environment:
+      API_UPSTREAM: ${FRONTEND_API_UPSTREAM:-http://nginx}
+    ports: ["${FRONTEND_PORT:-5173}:80"]
+    depends_on:
+      nginx: { condition: service_healthy }
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://127.0.0.1/healthz >/dev/null",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  # ---------------- application services (SERVER 1 in prod) ----------------
+  db-service:
+    <<: *app
+    build: { context: ../backend/db-service }
+    environment:
+      <<: *env
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in infra/.env}
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  auth:
+    <<: *app
+    build: { context: ../backend/auth }
+    environment: { <<: *env }
+    depends_on:
+      valkey: { condition: service_healthy }
+      db-service: { condition: service_started }
+    healthcheck:
+      test: ["CMD", "/app", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  main-service:
+    <<: *app
+    build: { context: ../backend/main-service }
+    environment:
+      <<: *env
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-512}
+      MP_API_KEY: ${MP_API_KEY:-} # Materials Project key for computed novelty (empty = stub)
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      localstack: { condition: service_healthy }
+      db-service: { condition: service_started }
+      llm-service: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "/app", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  llm-service:
+    <<: *app
+    build: { context: ../backend/llm-service }
+    environment:
+      <<: *env
+      GRPC_ADDR: ":9092" # см. комментарий у LLM_SERVICE_ADDR
+      # --- Agentic multi-hop retrieve-reason controller (Search-o1). Default OFF:
+      # with RAG_AGENTIC unset/false llm-service runs the single-shot RAG path
+      # byte-for-byte unchanged. When on, a cheap query-complexity gate escalates
+      # ONLY multi-hop questions to the loop; the rest stay single-shot. Every
+      # knob below is safe to leave at its default. ---
+      RAG_AGENTIC: ${RAG_AGENTIC:-false}
+      RAG_AGENTIC_MAX_HOPS: ${RAG_AGENTIC_MAX_HOPS:-3}
+      # Reasoner model for the loop's reasoning/condensation steps. Empty → reuse
+      # the generation model (VLLM_MODEL). Point at a 32B-class reasoner when on.
+      RAG_REASONER_MODEL: ${RAG_REASONER_MODEL:-}
+      RAG_REASONER_MAX_TOKENS: ${RAG_REASONER_MAX_TOKENS:-1024}
+      # Optional graph tool: fold graph-compute Personalized-PageRank neighbours
+      # into the candidate set. Off by default; degrades gracefully if unreachable.
+      RAG_AGENTIC_GRAPH: ${RAG_AGENTIC_GRAPH:-false}
+      RAG_AGENTIC_GRAPH_TOPN: ${RAG_AGENTIC_GRAPH_TOPN:-5}
+      GRAPH_COMPUTE_ADDR: ${GRAPH_COMPUTE_ADDR:-graph-compute:9093}
+      RAG_GRAPH_COMPUTE_TIMEOUT: ${RAG_GRAPH_COMPUTE_TIMEOUT:-10s}
+    depends_on:
+      valkey: { condition: service_healthy }
+      qdrant: { condition: service_started }
+      opensearch: { condition: service_started }
+      f2llm-service: { condition: service_healthy }
+      reranker-service: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "/app", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  chunk-splitter:
+    <<: *app
+    build: { context: ../backend/chunk-splitter }
+    environment: { <<: *env }
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      valkey: { condition: service_healthy } # interactive-priority pacing gauge
+      qdrant: { condition: service_started }
+      opensearch: { condition: service_started }
+      db-service: { condition: service_started }
+      f2llm-service: { condition: service_healthy }
+
+  pdf-parser:
+    <<: *app
+    build: { context: ../backend/pdf-parser }
+    environment: { <<: *env }
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      localstack: { condition: service_healthy }
+      db-service: { condition: service_started }
+
+  workbook-parser-service:
+    <<: *app
+    build: { context: ../ml-services/workbook-parser-service }
+    environment:
+      RUST_LOG: ${WORKBOOK_PARSER_LOG_LEVEL:-info}
+      HTTP_ADDR: "0.0.0.0:8095"
+      WORKBOOK_MAX_UPLOAD_MB: ${WORKBOOK_MAX_UPLOAD_MB:-128}
+
+  office-parser:
+    <<: *app
+    build: { context: ../backend/office-parser }
+    environment: { <<: *env }
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      localstack: { condition: service_healthy }
+      db-service: { condition: service_started }
+      workbook-parser-service: { condition: service_started }
+
+  db-parser:
+    <<: *app
+    build: { context: ../backend/db-parser }
+    environment: { <<: *env }
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      localstack: { condition: service_healthy }
+      db-service: { condition: service_started }
+
+  email-parser:
+    <<: *app
+    build: { context: ../backend/email-parser }
+    environment: { <<: *env }
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      localstack: { condition: service_healthy }
+      db-service: { condition: service_started }
+
+  ocr-service:
+    <<: *app
+    build: { context: ../backend/ocr-service }
+    environment: { <<: *env, OCR_HTTP_TIMEOUT: "${OCR_HTTP_TIMEOUT:-20m}" }
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      localstack: { condition: service_healthy }
+      db-service: { condition: service_started }
+      paddleocr-vl-service: { condition: service_healthy }
+
+  vlm-service:
+    <<: *app
+    build: { context: ../backend/vlm-service }
+    environment: { <<: *env }
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      localstack: { condition: service_healthy }
+      db-service: { condition: service_started }
+
+  diagram-parser-service:
+    <<: *app
+    profiles: ["diagram-parser"]
+    build:
+      context: ..
+      dockerfile: ml-services/diagram-parser-service/Dockerfile
+    environment:
+      DIAGRAM_OCR_URL: ${DIAGRAM_OCR_URL:-http://paddleocr-vl-service:8088}
+      DIAGRAM_OCR_MODEL: ${DIAGRAM_OCR_MODEL:-PaddleOCR-VL}
+      DIAGRAM_OCR_TIMEOUT: ${DIAGRAM_OCR_TIMEOUT:-90}
+      DIAGRAM_OCR_MODE: ${DIAGRAM_OCR_MODE:-full-image}
+      DIAGRAM_BLOCK_OCR_MAX_BLOCKS: ${DIAGRAM_BLOCK_OCR_MAX_BLOCKS:-12}
+      DIAGRAM_TILE_OCR_TIMEOUT: ${DIAGRAM_TILE_OCR_TIMEOUT:-45}
+      DIAGRAM_TILE_OVERLAP_PX: ${DIAGRAM_TILE_OVERLAP_PX:-32}
+      DIAGRAM_PARSE_CONCURRENCY: ${DIAGRAM_PARSE_CONCURRENCY:-1}
+      DIAGRAM_FAIL_OPEN: ${DIAGRAM_FAIL_OPEN:-false}
+    depends_on:
+      paddleocr-vl-service: { condition: service_healthy }
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8089/health', timeout=3)\"",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+
+  diagram-parser-paddle5-service:
+    <<: *app
+    profiles: ["diagram-parser-paddle5"]
+    runtime: nvidia
+    build:
+      context: ..
+      dockerfile: ml-services/diagram-parser-service/Dockerfile.paddle5
+    environment:
+      DIAGRAM_OCR_MODE: paddle5
+      DIAGRAM_PADDLE5_LANG: ${DIAGRAM_PADDLE5_LANG:-ru}
+      DIAGRAM_PADDLE5_DEVICE: ${DIAGRAM_PADDLE5_DEVICE:-gpu}
+      DIAGRAM_PADDLE5_DET_MODEL: ${DIAGRAM_PADDLE5_DET_MODEL:-PP-OCRv5_server_det}
+      DIAGRAM_PADDLE5_REC_MODEL: ${DIAGRAM_PADDLE5_REC_MODEL:-eslav_PP-OCRv5_mobile_rec}
+      DIAGRAM_PADDLE5_REC_BATCH_SIZE: ${DIAGRAM_PADDLE5_REC_BATCH_SIZE:-8}
+      DIAGRAM_PARSE_CONCURRENCY: ${DIAGRAM_PARSE_CONCURRENCY:-1}
+      DIAGRAM_FAIL_OPEN: ${DIAGRAM_FAIL_OPEN:-false}
+      PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK: ${PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK:-True}
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-all}
+    volumes:
+      - ../models/paddlex:/root/.paddlex
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8089/health', timeout=3)\"",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+
+  # ---------------- observability ----------------
+  prometheus:
+    image: prom/prometheus:v3.12.0
+    <<: *app
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - promdata:/prometheus
+    ports: ["127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"]
+
+  grafana:
+    image: grafana/grafana:12.3.7
+    <<: *app
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in infra/.env}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafanadata:/var/lib/grafana
+    ports: ["127.0.0.1:${GRAFANA_PORT:-3000}:3000"]
+    depends_on: [prometheus]
+
+  # Log collector. Needs the Docker socket, so it only runs with:
+  #   docker compose --profile logging up -d
+  vector:
+    image: timberio/vector:0.39.0-debian
+    <<: *app
+    profiles: ["logging"]
+    volumes:
+      - ./vector/vector.yaml:/etc/vector/vector.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: ["--config", "/etc/vector/vector.yaml"]
+
+  # ---------------- background product jobs ----------------
+  # Periodically evaluates live RAG quality and publishes the scorecard to
+  # /admin/metrics. Admins can trigger an extra run through the UI.
+  eval-service:
+    <<: *app
+    build: { context: ../ml-services/eval-service }
+    environment:
+      VALKEY_ADDR: valkey:6379
+      VALKEY_PASSWORD: ""
+      RAG_GATEWAY: http://nginx/api/v1
+      RAG_USER: ${ADMIN_USERNAME:-admin}
+      RAG_PASS: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in infra/.env}
+      RAG_ADMIN_USER: ${ADMIN_USERNAME:-admin}
+      RAG_ADMIN_PASS: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in infra/.env}
+      EVAL_EMBED_URL: http://f2llm-service:8085/v1/embeddings
+      EVAL_PROM_URL: http://prometheus:9090
+      EVAL_INTERVAL_SEC: ${EVAL_INTERVAL_SEC:-0} # 0 = scheduled eval off; admin-triggered runs still work
+      EVAL_STARTUP_DELAY_SEC: ${EVAL_STARTUP_DELAY_SEC:-120}
+      EVAL_CHECK_INTERVAL_SEC: ${EVAL_CHECK_INTERVAL_SEC:-10}
+      # Opt-in additive scorecards (never part of the gate). The hypothesis
+      # eval stays off by default (it spends generation-LLM calls hourly);
+      # the discovery eval only reads the published board, so it is free.
+      EVAL_HYPOTHESES: ${EVAL_HYPOTHESES:-0}
+      EVAL_DISCOVERY: ${EVAL_DISCOVERY:-1}
+      VLLM_URL: ${VLLM_URL:-}
+      VLLM_MODEL: ${VLLM_MODEL:-qwen3-35b-a3b}
+      VLLM_API_KEY: ${VLLM_API_KEY:-}
+    depends_on:
+      valkey: { condition: service_healthy }
+      nginx: { condition: service_started }
+      prometheus: { condition: service_started }
+      f2llm-service: { condition: service_healthy }
+
+  # Periodically recomputes deterministic ITC for themes and hypotheses.
+  itc-worker:
+    <<: *app
+    build: { context: ../ml-services/itc-worker }
+    environment:
+      VALKEY_ADDR: valkey:6379
+      VALKEY_PASSWORD: ""
+      RAG_GW: http://nginx/api/v1
+      RAG_USER: ${ADMIN_USERNAME:-admin}
+      RAG_PASS: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in infra/.env}
+      EMB_URL: http://f2llm-service:8085/v1/embeddings
+      ITC_INTERVAL_SEC: ${ITC_INTERVAL_SEC:-3600}
+      ITC_STARTUP_DELAY_SEC: ${ITC_STARTUP_DELAY_SEC:-180}
+      ITC_CHECK_INTERVAL_SEC: ${ITC_CHECK_INTERVAL_SEC:-10}
+    depends_on:
+      valkey: { condition: service_healthy }
+      nginx: { condition: service_started }
+      f2llm-service: { condition: service_healthy }
+
+networks:
+  ragnet: { driver: bridge }
+
+volumes:
+  pgdata: {}
+  rabbitmqdata: {}
+  valkeydata: {}
+  seaweedfsdata: {}
+  qdrantdata: {}
+  osdata: {}
+  promdata: {}
+  grafanadata: {}

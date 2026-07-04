@@ -1,0 +1,54 @@
+# Local env (real secrets; .env.example IS committed)
+.env
+.env.*
+!.env.example
+!.env.*.example
+datasets
+dataset
+models
+# Local experiment, benchmark and e2e artifacts.
+/.data/
+/reports/
+/artifacts/
+# Build output
+/bin/
+*.out
+/out/
+
+# Go
+/vendor/
+
+# Node / frontend
+node_modules/
+dist/
+*.local
+.playwright-cli/
+
+# Rust
+target/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.eggs/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+*.bak
+*.bak-*
+*.orig
+*.tmp
+ml-services/eval-service/results*.json
+docs/product/presentation/*.pdf
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Claude Code (local agent state, worktrees, transcripts)
+.claude/
+.ruff_cache/

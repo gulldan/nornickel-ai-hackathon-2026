@@ -1,0 +1,230 @@
+syntax = "proto3";
+
+package rag.graph.v1;
+
+option go_package = "github.com/example/rag-mvp/pkg/genproto/graph/v1;graphv1";
+
+// GraphCompute is a stateless graph/clustering engine. It reads document vectors
+// from Qdrant, builds a kNN cosine graph, runs community detection (Leiden by
+// default), and returns clusters with metrics, representatives and lineage.
+// Orchestrators (cluster-worker, discovery-worker) call it; all durable state
+// stays in Qdrant / Postgres / Valkey — this service holds none.
+service GraphCompute {
+  // Cluster scrolls the collection, pools chunks into document vectors and
+  // returns the community partition with metrics/representatives/lineage.
+  rpc Cluster(ClusterRequest) returns (ClusterResponse);
+
+  // Discovery layer (Фаза 3): score cross-community "bridges" — distant-but-affine
+  // theme pairs (structural holes) with ABC mediators — for hypothesis generation.
+  // Reuses the same kNN + Leiden graph as Cluster.
+  rpc ScoreBridges(BridgeRequest) returns (BridgeResponse);
+
+  // Graph-reasoning layer (Фаза 4): Personalized PageRank over the same kNN graph
+  // — the HippoRAG-2 substrate. The caller resolves a query to seed nodes; PPR
+  // propagates relevance from those seeds across the graph and ranks the corpus.
+  rpc Rank(RankRequest) returns (RankResponse);
+
+  // Graph-reasoning layer (Фаза 4): PathRAG — pruned connecting paths between two
+  // node sets. Returns the top reasoning chains linking sources to targets, scored
+  // by edge-weight flow with a length penalty.
+  rpc Paths(PathRequest) returns (PathResponse);
+
+  // Reserved: generic centrality export, implemented when discovery needs it.
+  // rpc Centrality(CentralityRequest) returns (CentralityResponse);
+}
+
+// ClusterConfig mirrors the knobs the Python cluster-worker used, so output stays
+// compatible with the existing clusters `params` JSON.
+message ClusterConfig {
+  uint32 knn_k = 1;                 // default 6
+  uint32 knn_block_size = 2;        // default 512
+  double resolution = 3;            // default 1.0 (Leiden semantics differ from Louvain)
+  uint32 min_size = 4;              // default 2 (drop smaller communities)
+  double sim_threshold = 5;         // default 0.0 (drop edges below this cosine)
+  bool mutual_knn = 6;              // default true (else union kNN)
+  bool chunk_weighting = 7;         // default true
+  uint32 chunk_lead_count = 8;      // default 2 (lead chunks boosted)
+  double chunk_w_lead = 9;          // default 2.0
+  double chunk_w_results = 10;      // default 1.5
+  double chunk_w_refs = 11;         // default 0.05
+  double lineage_overlap_min = 12;  // default 0.3
+  string algorithm = 13;            // "leiden" (default) | "louvain"
+  optional uint64 seed = 14;        // determinism (Python used 42)
+  optional uint32 max_iterations = 15; // Leiden iteration cap
+  // Clustering altitude. "document" (default, "") pools every chunk of a document
+  // into one node — the existing theme-board behaviour. "chunk" SKIPS pooling and
+  // clusters the raw chunk vectors directly (one node per Qdrant point), so the
+  // returned cluster `members` are chunk point ids. Used by raptor-worker to build
+  // the hierarchical RAPTOR summary layer over chunks.
+  string granularity = 16;
+}
+
+message DocumentRef {
+  string id = 1;
+  string filename = 2;
+}
+
+// PreviousCluster carries the prior board membership for lineage computation.
+message PreviousCluster {
+  string id = 1;
+  repeated string members = 2; // document ids
+}
+
+message ClusterRequest {
+  string owner_id = 1;                       // "" = shared/global corpus
+  string collection = 2;                     // Qdrant collection, default "documents"
+  ClusterConfig config = 3;
+  repeated DocumentRef documents = 4;         // owner-scoped doc list (filename map + scoping)
+  repeated PreviousCluster previous_clusters = 5; // for lineage; empty on first run
+}
+
+message Representative {
+  string document_id = 1;
+  string filename = 2;
+  string snippet = 3; // best prose snippet, <= 360 chars
+}
+
+message ClusterMetrics {
+  uint32 size = 1;                    // member count
+  double avg_similarity = 2;          // mean intra-cluster cosine
+  double modularity = 3;              // partition modularity Q
+  double modularity_contribution = 4; // this community's contribution to Q
+}
+
+message Lineage {
+  string previous_cluster_id = 1; // best Jaccard match
+  double jaccard = 2;
+  double stability = 3;           // == jaccard
+  repeated string merged_from = 4; // >=2 prior clusters folded in
+  string split_from = 5;          // set if the matched prior fed >=2 new clusters
+}
+
+message Cluster {
+  repeated string members = 1;            // document ids, sorted
+  string fingerprint = 2;                 // sha1[:16] of sorted members
+  repeated string signals = 3;            // representative texts for LLM labeling (Python step)
+  uint32 chunk_count = 4;
+  ClusterMetrics metrics = 5;
+  repeated Representative representatives = 6;
+  Lineage lineage = 7;                    // unset/empty when no prior board
+}
+
+message ComputeStats {
+  uint32 document_count = 1;
+  uint32 edge_count = 2;
+  double modularity = 3;       // whole-partition Q
+  uint64 compute_ms = 4;
+}
+
+message ClusterResponse {
+  repeated Cluster clusters = 1;
+  ComputeStats stats = 2;
+}
+
+// ---- ScoreBridges (discovery layer / Фабрика гипотез) -----------------------
+// Novelty lives in the EDGES between communities, not inside them: a pair of
+// themes that is semantically affine yet has few direct links (a structural
+// hole) is a candidate non-obvious connection. Each bridge carries ABC mediators
+// (documents linking the two themes) so the caller can ground a hypothesis.
+
+message BridgeConfig {
+  ClusterConfig cluster = 1;   // builds the same kNN + Leiden graph/communities
+  uint32 top_n = 2;            // max bridges returned (default 50)
+  double min_affinity = 3;     // min centroid cosine to consider a pair (default 0.15)
+  uint32 max_mediators = 4;    // ABC mediators returned per bridge (default 3)
+  uint32 min_convergence = 5;  // drop bridges with fewer mediating nodes (default 1; >=2 = convergent)
+  double w_maverick = 6;       // composite weight: distant recombination (default 1.0)
+  double w_bridging = 7;       // composite weight: bridging-centrality (default 1.0)
+  double w_vanguard = 8;       // composite weight: weak-tie reinforcement (default 0.5)
+}
+
+message BridgeRequest {
+  string owner_id = 1;
+  string collection = 2;
+  BridgeConfig config = 3;
+  repeated DocumentRef documents = 4;
+}
+
+message Mediator {
+  string document_id = 1;
+  string filename = 2;
+  string snippet = 3;
+}
+
+message BridgeScores {
+  double affinity = 1;            // centroid cosine between the two communities
+  double link_density = 2;        // realized cross edges / (|A|*|B|)
+  double maverick = 3;           // affinity * (1 - link_density): structural-hole recombination
+  double vanguard = 4;           // weak-tie reinforcement (affine pair with a few weak links)
+  double bridging_centrality = 5;// boundary betweenness * bridging coefficient
+  uint32 convergence = 6;        // number of mediating documents found
+  double composite = 7;          // ranked score
+}
+
+message Bridge {
+  string fingerprint = 1;        // sha1[:16] of sorted (community_a, community_b)
+  string community_a = 2;        // fingerprint of community A
+  string community_b = 3;        // fingerprint of community B
+  repeated string members_a = 4; // document ids in A (sorted)
+  repeated string members_b = 5; // document ids in B (sorted)
+  string endpoint_a = 6;         // anchor document in A (closest to B's centroid)
+  string endpoint_b = 7;         // anchor document in B (closest to A's centroid)
+  repeated Mediator mediators = 8; // ABC "B" nodes connecting the endpoints
+  BridgeScores scores = 9;
+}
+
+message BridgeResponse {
+  repeated Bridge bridges = 1;
+  ComputeStats stats = 2;
+}
+
+// ---- Rank (graph-reasoning layer / HippoRAG-2 Personalized PageRank) ---------
+// Builds the same kNN graph as Cluster, then ranks every node by Personalized
+// PageRank. `seed_ids` (Qdrant point ids) personalize the teleport vector toward
+// the query's resolved nodes — relevance flows outward from the seeds along the
+// graph; an empty seed set yields ordinary (uniform-teleport) PageRank.
+
+message RankRequest {
+  string owner_id = 1;             // "" = shared/global corpus
+  string collection = 2;          // Qdrant collection, default "documents"
+  ClusterConfig config = 3;       // builds the graph; honours `granularity` (document|chunk)
+  repeated string seed_ids = 4;   // point ids to personalize toward; empty = uniform PageRank
+  uint32 top_n = 5;               // max ranked nodes returned (0 = all)
+  double damping = 6;             // teleport/damping factor (default 0.85)
+  uint32 max_iterations = 7;      // power-iteration cap (default 100)
+}
+
+message RankedNode {
+  string id = 1;     // node id (document id, or chunk point id under chunk granularity)
+  double score = 2;  // Personalized PageRank mass (the full vector sums to 1)
+}
+
+message RankResponse {
+  repeated RankedNode nodes = 1; // sorted by score desc, then id asc; truncated to top_n
+  ComputeStats stats = 2;
+}
+
+// ---- Paths (graph-reasoning layer / PathRAG) --------------------------------
+// Enumerates the shortest connecting chains between two node sets, scores each by
+// edge-weight flow with a length penalty, dedups and returns the top reasoning
+// paths — the structural evidence PathRAG feeds an LLM.
+
+message PathRequest {
+  string owner_id = 1;
+  string collection = 2;
+  ClusterConfig config = 3;        // builds the graph; honours `granularity`
+  repeated string source_ids = 4;  // path start nodes (point ids)
+  repeated string target_ids = 5;  // path end nodes (point ids)
+  uint32 max_paths = 6;            // max paths returned (default 10)
+  uint32 max_hops = 7;             // max path length in edges (default 4)
+}
+
+message GraphPath {
+  repeated string node_ids = 1; // ordered node ids, source → target (inclusive)
+  double score = 2;             // flow/length score; higher = stronger, shorter chain
+}
+
+message PathResponse {
+  repeated GraphPath paths = 1; // sorted by score desc, then node_ids; truncated to max_paths
+  ComputeStats stats = 2;
+}

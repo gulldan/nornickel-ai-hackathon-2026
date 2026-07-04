@@ -1,0 +1,21 @@
+# Consulted ONLY by docker builds whose context is the repo root. Keep the root
+# context minimal: ship only central proto, graph-compute, and local ML services
+# that intentionally build from the repo root.
+*
+!backend/
+!backend/proto/
+!backend/proto/**
+!ml-services/
+!ml-services/graph-compute/
+!ml-services/graph-compute/**
+!ml-services/diagram-parser-service/
+!ml-services/diagram-parser-service/Dockerfile
+!ml-services/diagram-parser-service/Dockerfile.paddle5
+!ml-services/diagram-parser-service/pyproject.toml
+!ml-services/diagram-parser-service/uv.lock
+!ml-services/diagram-parser-service/diagram_parser_service/
+!ml-services/diagram-parser-service/diagram_parser_service/**
+**/target
+**/.git
+**/.DS_Store
+ml-services/graph-compute/criterion

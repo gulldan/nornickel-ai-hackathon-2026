@@ -1,0 +1,6 @@
+node_modules/
+dist/
+*.local
+# Артефакты Playwright (в т.ч. .auth-state.json с токеном стенда)
+test-results/
+playwright-report/

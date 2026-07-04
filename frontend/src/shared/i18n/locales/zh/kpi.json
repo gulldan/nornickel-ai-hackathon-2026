@@ -1,0 +1,154 @@
+{
+  "header": {
+    "kicker": "您的生产任务",
+    "title": "目标",
+    "hintLabel": "什么是目标",
+    "description": "您想达成的结果。系统会为每个目标从知识库中挑选并验证假设。"
+  },
+  "actions": {
+    "suggest": "从知识库推荐目标",
+    "suggestLoading": "正在分析知识库…",
+    "create": "创建目标"
+  },
+  "suggestions": {
+    "title": "来自知识库的推荐目标",
+    "description": "已上传文献中正在改进的指标。一键采纳合适的目标——会打开预填好字段的目标创建表单。",
+    "loading": "正在分析知识库…",
+    "error": "无法推荐目标",
+    "empty": "暂时无法推荐目标——请上传更多文档，系统会找出其中改进的指标。",
+    "aiNote": "目标基于已上传的文献推荐，仅供参考，并非经确认的指标。创建前请核对。"
+  },
+  "list": {
+    "error": "无法加载目标",
+    "viewAria": "目标筛选",
+    "activeTab": "进行中（{{count}}）",
+    "archivedTab": "归档（{{count}}）",
+    "archiveEmpty": "此列表暂时为空。"
+  },
+  "empty": {
+    "title": "创建第一个目标",
+    "description": "描述要改进什么以及用什么指标衡量。系统将基于您的文档生成假设，并展示每个结论的依据。"
+  },
+  "card": {
+    "hypotheses_other": "{{count}} 条假设",
+    "drafts_other": "{{count}} 份草稿",
+    "directionsCount_other": "{{count}} 个方向",
+    "generate": "生成假设",
+    "generating": "生成中…",
+    "generateHint": "系统将研读知识库文档，为该目标创建可验证的假设——它们会出现在“假设”页面。",
+    "directions": "来自您文档的建议",
+    "directionsHint": "来自您文档交叉处的提示：哪些工艺和性能会影响该目标。将在侧边面板打开。",
+    "edit": "编辑",
+    "delete": "删除",
+    "archive": "归档",
+    "archiveHint": "从工作列表中移除，不删除任何内容",
+    "unarchive": "从归档恢复"
+  },
+  "valueLine": {
+    "target": "目标值"
+  },
+  "direction": {
+    "increase": "提高",
+    "decrease": "降低",
+    "maintain": "保持"
+  },
+  "task": {
+    "generateTitle": "假设生成",
+    "generateSuccess": "已创建假设：{{count}}",
+    "generateError": "无法生成假设"
+  },
+  "toast": {
+    "created": "目标已创建",
+    "createError": "无法创建目标",
+    "directionSaved": "方向已保存为假设草稿",
+    "directionSavedHint": "可在“假设”页面的“草稿”标签页中找到。",
+    "directionSaveError": "无法保存方向",
+    "updated": "目标已更新",
+    "updateError": "保存更改失败",
+    "deleted": "目标已删除",
+    "deleteError": "删除目标失败",
+    "archived": "目标已归档",
+    "unarchived": "目标已从归档恢复"
+  },
+  "dialog": {
+    "title": "新建目标",
+    "name": "名称",
+    "namePlaceholder": "例如：提高 Ni 合金在 800 °C 下的耐热性",
+    "description": "描述",
+    "descriptionPlaceholder": "简要说明，选填",
+    "metric": "指标（用于衡量结果）",
+    "metricPlaceholder": "例如：单次操作成本",
+    "unit": "单位",
+    "unitPlaceholder": "百万卢布 / % / …",
+    "baseline": "基线",
+    "target": "目标值",
+    "targetPlaceholder": "选填",
+    "directionNote": "变化方向会自动判断。若目标值暂不确定，可以不填写。",
+    "functionArea": "工段或工艺环节",
+    "functionAreaPlaceholder": "例如：耐热合金，选填",
+    "cancel": "取消",
+    "create": "创建",
+    "creating": "创建中…",
+    "editTitle": "编辑目标",
+    "save": "保存",
+    "saving": "保存中…"
+  },
+  "sheet": {
+    "title": "来自知识图谱的方向",
+    "intro": "系统串联不同文档中的知识：哪个工艺影响哪个性能、又如何助力目标。保存看中的方向——它会成为“假设”页面上的假设草稿。",
+    "loading": "正在知识图谱中寻找关联…",
+    "error": "无法获取方向",
+    "emptyTitle": "暂无方向",
+    "emptyDescription": "该目标在知识图谱中的关联还太少。请上传更多文档或生成假设，系统会在其交叉处找到方向。",
+    "shownOf": "显示 {{shown}} / {{total}}。上限可在系统设置中修改。",
+    "aiNote": "方向基于知识库中的关联推荐，仅为研发提示，并非经确认的结论。"
+  },
+  "directionCard": {
+    "sources": "来源：",
+    "document": "文档",
+    "saved": "已保存到草稿",
+    "saving": "保存中…",
+    "save": "保存为假设",
+    "savedHint": "将出现在“假设”页面的“草稿”标签页中"
+  },
+  "delete": {
+    "title": "删除目标“{{title}}”？",
+    "body": "为该目标创建的假设和方向将保留——只是与目标解除关联。此操作无法撤销。",
+    "confirm": "删除",
+    "deleting": "删除中…"
+  },
+  "wizard": {
+    "title": "新目标与假设",
+    "description": "用自己的话描述任务，并附上企业数据——报告、流程图、规程、限制条件。",
+    "goal": "目标",
+    "newGoal": "新目标——用文字描述",
+    "prompt": "需要改进什么",
+    "promptExisting": "补充说明与限制",
+    "promptPlaceholder": "例如：将二厂铜回收率从82%提高到86%。预算不超过5000万，不购买新浮选设备，可更换药剂。",
+    "promptExistingPlaceholder": "例如：预算不超过5000万，不更换设备，年底前完成。",
+    "promptHint": "系统会自动从文本中提取目标名称、指标和限制条件。",
+    "addFiles": "添加文件或拖拽到此处",
+    "dropHere": "松开鼠标即可将文件附加到目标",
+    "filesNote": "附加的文件将成为该目标的输入数据：问题和事实来自这些文件，论证来自知识库。",
+    "fileIndexing": "处理中…",
+    "fileAlreadyInBase": "库中已存在",
+    "fileFailed": "处理失败",
+    "fileRemove": "移除文件",
+    "count": "假设数",
+    "create": "创建目标",
+    "attach": "附加到目标",
+    "createAndGenerate": "创建并生成",
+    "generate": "生成假设",
+    "busy": "请稍候…",
+    "attachedToast": "文档已附加到目标",
+    "suggestionMetric": "指标",
+    "editTitle": "编辑目标",
+    "editDescription": "您的描述与附加数据。修改文本或文件，必要时重新生成假设。",
+    "editHint": "修改文本后，系统会重新提取名称、指标和限制条件。",
+    "filesLabel": "企业数据",
+    "addMoreFiles": "再添加文件",
+    "save": "保存",
+    "saveAndGenerate": "保存并生成",
+    "detachError": "移除文档失败"
+  }
+}

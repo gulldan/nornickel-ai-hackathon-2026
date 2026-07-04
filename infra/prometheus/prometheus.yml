@@ -1,0 +1,27 @@
+# Prometheus scrapes every Go service's /metrics (each runs a metrics server on
+# :9090 via pkg/observability). Scaled workers resolve to one replica per scrape
+# via Docker DNS — fine for an MVP; use a service-discovery target in production.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: rag-services
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "db-service:9090"
+          - "auth:9090"
+          - "main-service:9090"
+          - "llm-service:9090"
+          - "chunk-splitter:9090"
+          - "pdf-parser:9090"
+          - "office-parser:9090"
+          - "email-parser:9090"
+          - "ocr-service:9090"
+          - "vlm-service:9090"
+          - "archive-worker:9090"

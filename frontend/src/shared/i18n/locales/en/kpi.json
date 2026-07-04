@@ -1,0 +1,157 @@
+{
+  "header": {
+    "kicker": "Your production goals",
+    "title": "Goals",
+    "hintLabel": "What is a goal",
+    "description": "What you want to achieve. For each goal the system finds and tests hypotheses from the knowledge base."
+  },
+  "actions": {
+    "suggest": "Suggest goals from the knowledge base",
+    "suggestLoading": "Analyzing the knowledge base…",
+    "create": "Create goal"
+  },
+  "suggestions": {
+    "title": "Recommended goals from the knowledge base",
+    "description": "Metrics that the uploaded works improve. Accept a suitable one in a single click — the create-goal form opens with the fields pre-filled.",
+    "loading": "Analyzing the knowledge base…",
+    "error": "Failed to suggest goals",
+    "empty": "No goals to suggest yet — upload more documents and the system will find what they improve.",
+    "aiNote": "Goals are suggested from the uploaded works — they are hints, not confirmed metrics. Review before creating."
+  },
+  "list": {
+    "error": "Failed to load goals",
+    "viewAria": "Goals filter",
+    "activeTab": "Active ({{count}})",
+    "archivedTab": "Archive ({{count}})",
+    "archiveEmpty": "This list is empty for now."
+  },
+  "empty": {
+    "title": "Create your first goal",
+    "description": "Describe what to improve and how to measure it. The system will build hypotheses from your documents and show what every conclusion is based on."
+  },
+  "card": {
+    "hypotheses_one": "{{count}} hypothesis",
+    "hypotheses_other": "{{count}} hypotheses",
+    "drafts_one": "{{count}} draft",
+    "drafts_other": "{{count}} drafts",
+    "directionsCount_one": "{{count}} direction",
+    "directionsCount_other": "{{count}} directions",
+    "generate": "Generate hypotheses",
+    "generating": "Generating…",
+    "generateHint": "The system will study the knowledge-base documents and create testable hypotheses for this goal — they will appear on the Hypotheses page.",
+    "directions": "Suggestions from your documents",
+    "directionsHint": "Hints from the intersection of your documents: which processes and properties affect this goal. They open in a side panel.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "archive": "Archive",
+    "archiveHint": "Remove from the working list without deleting anything",
+    "unarchive": "Restore from archive"
+  },
+  "valueLine": {
+    "target": "target"
+  },
+  "direction": {
+    "increase": "increase",
+    "decrease": "decrease",
+    "maintain": "maintain"
+  },
+  "task": {
+    "generateTitle": "Hypothesis generation",
+    "generateSuccess": "Hypotheses created: {{count}}",
+    "generateError": "Failed to generate hypotheses"
+  },
+  "toast": {
+    "created": "Goal created",
+    "createError": "Failed to create goal",
+    "directionSaved": "Direction saved as a hypothesis draft",
+    "directionSavedHint": "You can find it on the Hypotheses page under the Drafts tab.",
+    "directionSaveError": "Failed to save direction",
+    "updated": "Goal updated",
+    "updateError": "Failed to save changes",
+    "deleted": "Goal deleted",
+    "deleteError": "Failed to delete the goal",
+    "archived": "Goal archived",
+    "unarchived": "Goal restored from archive"
+  },
+  "dialog": {
+    "title": "New goal",
+    "name": "Title",
+    "namePlaceholder": "e.g. Increase heat resistance of a Ni alloy at 800 °C",
+    "description": "Description",
+    "descriptionPlaceholder": "brief, optional",
+    "metric": "Metric (how you will measure the result)",
+    "metricPlaceholder": "e.g. cost per operation",
+    "unit": "Unit",
+    "unitPlaceholder": "mln ₽ / % / …",
+    "baseline": "Baseline",
+    "target": "Target value",
+    "targetPlaceholder": "optional",
+    "directionNote": "The direction of change is inferred automatically. You can leave the exact target value empty if it is not known yet.",
+    "functionArea": "Site or process stage",
+    "functionAreaPlaceholder": "e.g. Heat-resistant alloys, optional",
+    "cancel": "Cancel",
+    "create": "Create",
+    "creating": "Creating…",
+    "editTitle": "Edit goal",
+    "save": "Save",
+    "saving": "Saving…"
+  },
+  "sheet": {
+    "title": "Directions from the knowledge graph",
+    "intro": "The system links knowledge across documents: which process affects which property and how that helps the goal. Save a direction you like — it becomes a hypothesis draft on the Hypotheses page.",
+    "loading": "Searching the knowledge graph for connections…",
+    "error": "Failed to get directions",
+    "emptyTitle": "No directions yet",
+    "emptyDescription": "The knowledge graph has too few connections for this goal yet. Upload more documents or generate hypotheses — the system will find directions at their intersection.",
+    "shownOf": "Showing {{shown}} of {{total}}. The limit can be changed in system settings.",
+    "aiNote": "Directions are suggested from connections in the knowledge base — they are R&D hints, not confirmed conclusions."
+  },
+  "directionCard": {
+    "sources": "Sources:",
+    "document": "document",
+    "saved": "Saved to drafts",
+    "saving": "Saving…",
+    "save": "Save as hypothesis",
+    "savedHint": "it will appear under the Drafts tab on the Hypotheses page"
+  },
+  "delete": {
+    "title": "Delete goal “{{title}}”?",
+    "body": "Hypotheses and directions created for this goal will remain — they simply become unlinked. This cannot be undone.",
+    "confirm": "Delete",
+    "deleting": "Deleting…"
+  },
+  "wizard": {
+    "title": "New goal and hypotheses",
+    "description": "Describe the task in your own words and attach plant data — reports, flowsheets, regulations, constraints.",
+    "goal": "Goal",
+    "newGoal": "New goal — I'll describe it in text",
+    "prompt": "What to improve",
+    "promptExisting": "Clarifications and constraints",
+    "promptPlaceholder": "E.g.: raise copper recovery at plant #2 from 82 to 86%. Budget up to 50M, no new flotation equipment, reagents may change.",
+    "promptExistingPlaceholder": "E.g.: budget up to 50M, keep existing equipment, deadline — end of year.",
+    "promptHint": "The system extracts the goal title, metric and constraints from your text.",
+    "addFiles": "Add files or drop them here",
+    "dropHere": "Drop the files to attach them to the goal",
+    "filesNote": "Attached files become this goal's input data: problems and facts come from them, justification comes from the knowledge base.",
+    "fileIndexing": "Processing…",
+    "fileAlreadyInBase": "Already in the base",
+    "fileFailed": "Processing failed",
+    "fileRemove": "Remove file",
+    "count": "Hypotheses",
+    "create": "Create goal",
+    "attach": "Attach to goal",
+    "createAndGenerate": "Create and generate",
+    "generate": "Generate hypotheses",
+    "busy": "Please wait…",
+    "attachedToast": "Documents attached to the goal",
+    "suggestionMetric": "Metric",
+    "editTitle": "Edit goal",
+    "editDescription": "Your wording and attached data. Change the text or files — and regenerate hypotheses if needed.",
+    "editHint": "If you change the text, the system re-extracts the title, metric and constraints.",
+    "filesLabel": "Plant data",
+    "addMoreFiles": "Add more files",
+    "save": "Save",
+    "saveAndGenerate": "Save and generate",
+    "detachError": "Failed to remove the document"
+  }
+}

@@ -1,0 +1,603 @@
+{
+  "board": {
+    "kicker": "Portfolio",
+    "title": "Hypotheses",
+    "whatIsHypothesis": "What is a hypothesis",
+    "description": "Testable R&D hypotheses for your goals: mechanism, evidence, risk, value and an experiment plan.",
+    "searchPlaceholder": "Search by technology, effect, location",
+    "searchAria": "Search hypotheses",
+    "facetCompany": "Application area",
+    "facetFunc": "How obtained",
+    "facetSource": "Source type",
+    "facetTrlAll": "Any readiness",
+    "facetResearchAll": "Any type",
+    "allGoals": "All goals",
+    "reset": "Reset",
+    "resetFilters": "Reset filters",
+    "range": "{{from}}–{{to}} of {{total}}",
+    "rangeFiltered": " (filtered, {{total}} total in this tab)",
+    "loadError": "Failed to load hypotheses",
+    "loadRefsError": "Failed to load reference data",
+    "loadPageError": "Failed to load the next page",
+    "emptyFiltered": "Nothing matches the current filters. Change the search terms or reset the filters.",
+    "emptyQueue": "This queue is empty for now — pick another queue above.",
+    "facetSearch": "Find a value…",
+    "facetNothing": "Nothing found",
+    "facetReset": "Clear filter",
+    "facetTrl": "Readiness (TRL)",
+    "facetResearch": "Research type",
+    "facetGoal": "Goal",
+    "chipRemove": "Remove filter: {{value}}"
+  },
+  "tabs": {
+    "hypotheses": "Hypotheses",
+    "directions": "Suggestions from the base",
+    "drafts": "Drafts",
+    "graph": "Source links",
+    "methodology": "Methodology"
+  },
+  "tabHints": {
+    "hypotheses": "A hypothesis is a testable assumption about what to improve and how, built on the documents in your knowledge base. The system verifies each one against the base and estimates technology readiness — cards update automatically.",
+    "directions": "A direction is a promising research area found automatically in the topics of your base. It is a hint for choosing a goal: concrete hypotheses can be generated from a direction.",
+    "drafts": "A draft is a hypothesis stub that does not yet have enough supporting evidence in the base. It can be refined into a full hypothesis or deleted.",
+    "graph": "The knowledge graph shows which documents each hypothesis relies on: green links support it, red links contradict it. Shared documents connect related hypotheses.",
+    "methodology": "How the system creates, verifies and scores hypotheses — step by step."
+  },
+  "empty": {
+    "hypotheses": {
+      "title": "No hypotheses yet",
+      "text": "Create a goal and run generation — hypotheses will appear here with evidence and a rating."
+    },
+    "directions": {
+      "title": "No directions yet",
+      "text": "Directions are assembled automatically from the topics of the knowledge base. Upload more documents — and the system will find promising areas."
+    },
+    "drafts": {
+      "title": "No drafts",
+      "text": "Rejected and unfinished hypotheses end up here. There are none for now — everything is in progress on the Hypotheses tab."
+    }
+  },
+  "queues": {
+    "all": {
+      "label": "All",
+      "hint": "The whole hypothesis portfolio"
+    },
+    "needsVerify": {
+      "label": "Under review",
+      "hint": "The system is collecting arguments for and against"
+    },
+    "ready": {
+      "label": "Ready",
+      "hint": "An experiment can be planned"
+    },
+    "risk": {
+      "label": "Contradictions",
+      "hint": "There are arguments against — needs a closer look"
+    },
+    "insufficient": {
+      "label": "Not enough evidence",
+      "hint": "Verification finished: the corpus holds too little evidence for or against. It won't change on its own — add sources and re-check, refine the wording, or close it manually."
+    }
+  },
+  "sorts": {
+    "rank": "Best to test",
+    "learning": "What to test next",
+    "itc": "By tech index",
+    "novelty": "By novelty",
+    "trl": "By readiness",
+    "recent": "Newest first"
+  },
+  "actions": {
+    "export": "Export",
+    "exportCsv": "CSV for Excel",
+    "exportJson": "JSON for integrations",
+    "exportPdf": "Printable report (PDF)",
+    "digest": "Digest",
+    "generate": "Generate hypotheses",
+    "exportJira": "CSV for Jira",
+    "exportTasks": "Tasks JSON (trackers)",
+    "exportDocx": "Word report (DOCX)"
+  },
+  "generate": {
+    "title": "Generate hypotheses",
+    "description": "The system will study the knowledge-base documents and propose testable ways to reach the selected goal.",
+    "goal": "Goal",
+    "newGoal": "New goal…",
+    "metricLine": "Metric: {{value}}",
+    "goalOnly": "Hypotheses will be created for this goal.",
+    "goalTitle": "Goal title",
+    "goalTitlePlaceholder": "e.g. reduce copper losses to flotation tailings",
+    "context": "Context (optional)",
+    "contextPlaceholder": "site, ore type and production specifics",
+    "constraints": "Constraints (optional)",
+    "constraintsPlaceholder": "what is allowed and what is not: budget, equipment, reagents, sales…",
+    "constraintsHint": "The system will not propose hypotheses that violate these constraints.",
+    "metric": "Metric (optional)",
+    "metricPlaceholder": "Cu recovery, %",
+    "count": "How many hypotheses",
+    "backgroundNote": "Generation runs in the background and takes one–two minutes — finished hypotheses will appear on the board by themselves; you can close this window.",
+    "busy": "Generating…",
+    "taskTitle": "Hypothesis generation",
+    "created": "Hypotheses created: {{n}}",
+    "failed": "Failed to generate hypotheses",
+    "dataNote": "Hypotheses are built from the documents in your knowledge base. Add your reports, flowsheets and regulations on the Documents page.",
+    "dataLink": "Upload data"
+  },
+  "digest": {
+    "dialogTitle": "Hypothesis digest ({{n}})",
+    "dialogDescription": "A summary of the hypotheses matching the selected filters — copy it or download as a file.",
+    "copied": "Digest copied",
+    "downloadMd": "Download .md",
+    "fileName": "hypothesis-digest.md",
+    "heading": "Hypothesis digest ({{n}})",
+    "priority": "priority {{n}}/100",
+    "rationale": "Rationale",
+    "mechanism": "Mechanism",
+    "successCriteria": "Success criteria",
+    "scores": "Scores",
+    "novelty": "novelty {{value}}",
+    "risk": "risk {{value}}",
+    "value": "value {{value}}",
+    "confidence": "confidence {{value}}"
+  },
+  "export": {
+    "empty": "No hypotheses to export",
+    "csvFileName": "hypotheses.csv",
+    "jsonFileName": "hypotheses.json",
+    "csv": {
+      "title": "Title",
+      "statement": "Statement",
+      "priority": "Priority",
+      "trl": "Readiness (TRL)",
+      "novelty": "Novelty",
+      "risk": "Risk",
+      "value": "Value",
+      "confidence": "Confidence",
+      "organization": "Area",
+      "method": "Method/direction",
+      "source": "Source",
+      "location": "Location",
+      "status": "Status",
+      "tags": "Tags"
+    },
+    "jiraFileName": "hypotheses-jira.csv",
+    "tasksFileName": "hypotheses-tasks.json",
+    "docxLoading": "Building the Word report…",
+    "docxReady": "Word report downloaded",
+    "docxError": "Couldn’t build the Word file"
+  },
+  "statuses": {
+    "draft": "Draft",
+    "generated": "Generated",
+    "underReview": "Under review",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "archived": "Archived"
+  },
+  "verdicts": {
+    "supported": "supported",
+    "refuted": "refuted",
+    "mixed": "contradictory",
+    "insufficient": "insufficient data",
+    "unverified": "not verified"
+  },
+  "origins": {
+    "bridge": "Bridge between topics",
+    "topic": "From a topic",
+    "manual": "Manual",
+    "goal": "From a goal"
+  },
+  "badges": {
+    "direction": "Direction"
+  },
+  "trl": {
+    "none": "Readiness —",
+    "value": "Readiness {{trl}}/9"
+  },
+  "researchTypes": {
+    "theoretical": "Theoretical",
+    "practical": "Practical"
+  },
+  "untitled": "Untitled",
+  "schemaFields": {
+    "intervention": "intervention",
+    "mechanism": "mechanism",
+    "target": "target KPI",
+    "validationPlan": "validation plan"
+  },
+  "confidenceFacets": {
+    "belief": {
+      "label": "Confidence in the hypothesis",
+      "hint": "How strongly the scientific corpus supports that the hypothesis is true."
+    },
+    "verdict": {
+      "label": "Confidence in the verification",
+      "hint": "How reliable the verification conclusion itself is."
+    },
+    "evidence": {
+      "label": "Evidence quality",
+      "hint": "How strong the sources behind the conclusion are."
+    }
+  },
+  "card": {
+    "ratingAria": "Rating {{rank}} out of 100",
+    "owner": "Author: {{name}}"
+  },
+  "methodology": {
+    "howTitle": "How it works",
+    "howDescription": "The path from documents to a testable hypothesis.",
+    "pipeline": {
+      "parsing": {
+        "title": "Parsing the knowledge base",
+        "text": "Documents are split into fragments, cleaned of technical noise and linked to their source — every conclusion can be opened at the exact place in the article or report."
+      },
+      "topics": {
+        "title": "Topics and directions",
+        "text": "The system groups similar fragments into topics and sketches directions on its own — a map of promising areas. This is reconnaissance over the corpus, not proven hypotheses."
+      },
+      "generation": {
+        "title": "Generating hypotheses for a goal",
+        "text": "For a goal, relevant fragments are retrieved, materials, processes and properties are extracted, and a testable link is formed: what to change, where to apply it and which indicator measures the effect."
+      },
+      "ranking": {
+        "title": "Verification and ranking",
+        "text": "The rating is computed with a transparent formula from goal fit, evidence strength, novelty, value, risk and technology readiness. An expert can change the status and refine the passport."
+      }
+    },
+    "definitions": {
+      "evidence": {
+        "group": "How to read the evidence",
+        "stances": {
+          "term": "For / against / mentions",
+          "text": "\"For\" — the fragment supports the hypothesis, \"against\" — refutes it, \"mentions\" — on topic but without a direct conclusion. Until the hypothesis is verified against the base, the counters stay empty."
+        },
+        "verdict": {
+          "term": "Verification verdict",
+          "text": "\"Supported\" — there is support with no serious contradictions; \"refuted\" — refutations prevail; \"contradictory\" — both were found; \"insufficient data\" — too little on the topic."
+        }
+      },
+      "links": {
+        "group": "What the system connects",
+        "evidenceGraph": {
+          "term": "Evidence graph",
+          "text": "Connects hypotheses to specific documents and fragments. Every edge is marked as for, against or mention — you can open the source and check the exact place."
+        },
+        "knowledgeGraph": {
+          "term": "Knowledge graph",
+          "text": "Connects not articles by citations but extracted chains material → process → property → goal. New directions are born from their intersections."
+        }
+      },
+      "ranking": {
+        "group": "What the rating is made of",
+        "kpiFit": {
+          "term": "Goal fit",
+          "text": "How much the hypothesis actually moves the chosen indicator."
+        },
+        "evidenceBase": {
+          "term": "Evidence base",
+          "text": "How many independent fragments were found and whether there are contradictions."
+        },
+        "novelty": {
+          "term": "Novelty",
+          "text": "How much the solution differs from already known works and patents."
+        },
+        "valueRisk": {
+          "term": "Value and risk",
+          "text": "The potential payoff against technical limitations and side effects."
+        },
+        "readiness": {
+          "term": "Readiness",
+          "text": "How close the idea is to a laboratory test on the TRL scale."
+        }
+      }
+    },
+    "aiNote": "The system speeds up the start of R&D: it collects arguments and options, but does not replace engineering expertise, a test plan and checking the original sources.",
+    "weightsTitle": "Ranking weights",
+    "weightsDescription": "Choose what matters most when prioritizing your hypotheses — the weights apply to your portfolio on the next board load."
+  },
+  "graph": {
+    "loadError": "Failed to load the knowledge graph",
+    "emptyTitle": "The graph is empty for now",
+    "emptyText": "Generate hypotheses — they will appear here together with the documents they rely on.",
+    "stats": {
+      "hypotheses": "Hypotheses",
+      "documents": "Sources",
+      "links": "Evidence links",
+      "totalDocs": "Total sources",
+      "inView": "in view",
+      "hiddenDocs_one": "{{count}} low-signal source hidden",
+      "hiddenDocs_other": "{{count}} low-signal sources hidden",
+      "grouped": "grouped by source pair",
+      "available": "available in current scope"
+    },
+    "searchPlaceholder": "Search hypotheses or sources",
+    "searchAria": "Search in the evidence graph",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fit": "Fit to view",
+    "focus": "Focus",
+    "selected": "Selected",
+    "noFocus": "Select a node",
+    "hypothesis": "Hypothesis",
+    "document": "Source",
+    "source": "source",
+    "focusType": "Type",
+    "centerSelected": "Center",
+    "openHypothesis": "Open hypothesis",
+    "openSource": "Open source",
+    "open": "Open",
+    "evidence": "Evidence",
+    "fragments_one": "{{count}} fragment",
+    "fragments_other": "{{count}} fragments",
+    "moreRelated_one": "+{{count}} more",
+    "moreRelated_other": "+{{count}} more",
+    "quickNav": "Hypothesis index",
+    "quickNavHint": "Tap a hypothesis — its sources light up in the graph and its evidence opens on the right",
+    "sourceCount_one": "{{count}} source",
+    "sourceCount_other": "{{count}} sources",
+    "noSources": "no sources",
+    "sourceOrigin": {
+      "input": "Your documents",
+      "knowledge": "Knowledge base",
+      "web": "External source"
+    },
+    "stances": {
+      "supports": "Supports",
+      "contradicts": "Contradicts",
+      "mixed": "Mixed",
+      "context": "Context"
+    },
+    "related": "Related",
+    "noRelated": "No related nodes in the current view.",
+    "topHypotheses": "Top hypotheses",
+    "aria": "Knowledge graph: hypotheses and source documents",
+    "stanceAll": "All links",
+    "nodeLegend": {
+      "supported": "supported",
+      "refuted": "refuted",
+      "mixed": "mixed",
+      "unverified": "unverified",
+      "document": "source"
+    }
+  },
+  "report": {
+    "loadError": "Failed to build the report",
+    "back": "Back to the board",
+    "savePdf": "Save as PDF",
+    "kicker": "Hypothesis Factory · {{date}}",
+    "title": "Hypothesis portfolio report",
+    "summary": "Hypotheses in the portfolio: {{total}} · approved by experts: {{approved}} · goals: {{goals}}",
+    "goalsTitle": "Goals and their coverage",
+    "goalsHead": {
+      "goal": "Goal",
+      "target": "Baseline → target",
+      "hypotheses": "Hypotheses",
+      "approved": "Approved",
+      "best": "Best priority"
+    },
+    "rankingTitle": "Hypothesis ranking",
+    "rankingNote": "Priority follows a transparent formula: goal fit, evidence, novelty, value, risk, readiness — taking the expert's decision into account.",
+    "rankHead": {
+      "num": "No.",
+      "hypothesis": "Hypothesis",
+      "priority": "Priority",
+      "novelty": "Novelty",
+      "value": "Value",
+      "risk": "Risk",
+      "trl": "TRL",
+      "status": "Status"
+    },
+    "truncated": "Showing the top {{shown}} of {{total}}; the full list is in the CSV/JSON export.",
+    "footer": "This report was generated automatically by the Hypothesis Factory. Novelty, value and risk scores are model-based and require expert validation; every hypothesis links to its sources in the system.",
+    "execTitle": "Executive summary",
+    "execNote": "Key technology themes of the corpus by the technology index (TechScore).",
+    "execScore": "Technology index {{score}}/10",
+    "execCounts": "Documents: {{docs}} · hypotheses in theme: {{linked}}",
+    "passportsTitle": "Theme passports",
+    "passportScore": "Index {{score}}/10",
+    "passportSignals": "Publications: {{pubs}} · organizations: {{orgs}} · hypotheses in theme: {{linked}}",
+    "pilotsTitle": "Hypotheses for pilots",
+    "pilotsNote": "Portfolio top by priority — candidates for the first experiments.",
+    "pilotCriteria": "Success criteria",
+    "pilotRationale": "Rationale",
+    "pilotConstraints": "Constraints taken into account",
+    "pilotSources": "World practice (open publications)",
+    "saveDocx": "Download Word",
+    "savingDocx": "Preparing Word…",
+    "docxError": "Couldn’t build the Word file",
+    "docxFileName": "hypotheses-report.docx"
+  },
+  "hreport": {
+    "doctype": "R&D Hypothesis Report",
+    "generatedAt": "generated {{date}}",
+    "version": "version {{n}}",
+    "generatedBy": "Generated by Hypothesis Factory: {{kind}}, model {{model}}, {{date}}",
+    "ownerLine": "Owner: {{name}}",
+    "goalLine": "Goal: {{title}} ({{target}})",
+    "themeLine": "Theme: {{title}}",
+    "expertVerified": "Reviewed by an expert",
+    "expertNotVerified": "Not yet expert-verified",
+    "scientificNote": "Scientific (non-measurable) hypothesis",
+    "forAgainst": "{{forCount}} for, {{againstCount}} against",
+    "evidenceLine": "{{docs}} document(s): {{forCount}} for, {{againstCount}} against",
+    "missing": "missing: {{missing}}",
+    "trlPending": "being assessed",
+    "disclaimer": "Novelty, value, risk and readiness scores are model-estimated and require expert validation; every claim is backed by source references.",
+    "p": {
+      "goal": "Goal",
+      "theme": "Theme",
+      "verdict": "Verification verdict",
+      "priority": "Priority",
+      "novelty": "Novelty",
+      "value": "Value",
+      "risk": "Risk",
+      "confidence": "Confidence",
+      "itc": "Technology index",
+      "trl": "Readiness (TRL)",
+      "evidence": "Evidence",
+      "specialties": "Specialties",
+      "completeness": "Passport completeness"
+    },
+    "abstractTitle": "Abstract",
+    "a": {
+      "object": "Object of study: {{object}}",
+      "goal": "Objective: {{title}} ({{target}}).",
+      "goalProblem": "Objective: {{problem}}",
+      "data": "Data: {{docs}} knowledge-base document(s), {{external}} external publications.",
+      "result": "Automated corpus check result: {{verdict}} ({{forCount}} for, {{againstCount}} against).",
+      "resultPending": "The automated corpus check had not finished when this report was generated.",
+      "recommendation": "Recommendation: {{rec}}",
+      "effect": "Expected effect: {{effect}}."
+    },
+    "keywords": "KEYWORDS: {{words}}",
+    "introTitle": "Introduction",
+    "introGoal": "The work targets the goal “{{title}}” ({{target}}).",
+    "driversLead": "Drivers:",
+    "freshnessNote": "Topic freshness in world practice: {{value}} (OpenAlex). {{rationale}}",
+    "abbreviations": "Abbreviations: TRL — technology readiness level; ITC — technology index; KPI — key performance indicator.",
+    "sec1Title": "Hypothesis and rationale",
+    "rationaleSub": "Rationale",
+    "constraintsLead": "Stated constraints: {{constraints}}",
+    "quantTableTitle": "Quantitative parameters",
+    "q": {
+      "param": "Parameter",
+      "value": "Value",
+      "unit": "Unit",
+      "role": "Role",
+      "range": "Range"
+    },
+    "materialsSub": "Materials passport",
+    "m": {
+      "system": "Material system",
+      "composition": "Composition change",
+      "process": "Process change",
+      "microstructure": "Mechanism (microstructure)",
+      "property": "Target property"
+    },
+    "applicationObjects": "Application objects: {{objects}}.",
+    "applicationConditions": "Conditions: {{conditions}}.",
+    "mechanismSub": "Mechanism: causal chain",
+    "causalTableTitle": "Causal chain composition → process → microstructure → property → KPI",
+    "c": {
+      "stage": "Stage",
+      "change": "Change"
+    },
+    "sec2Title": "Scores and their explanations",
+    "rankingTableTitle": "Composite ranking factors",
+    "r": {
+      "factor": "Factor",
+      "weight": "Weight",
+      "value": "Value",
+      "contribution": "Contribution",
+      "detail": "Detail"
+    },
+    "priorityTotal": "Total priority: {{score}}/100.",
+    "freshnessLabel": "Topic freshness",
+    "trlLine": "Technology readiness level: TRL {{level}} — {{name}}.",
+    "trlMet": "met",
+    "trlNotMet": "not met",
+    "confidenceSub": "Verification confidence (by facet)",
+    "unverifiedNote": "Automated verification is not finished — treat the scores with caution.",
+    "learningLine": "Re-testing priority: {{score}} (testing value {{value}}, uncertainty {{uncertainty}}).",
+    "sec3Title": "Evidence for and against",
+    "noEvidence": "No corpus evidence collected yet; the automated check had not finished when this report was generated.",
+    "checkConfidence": "confidence {{value}}",
+    "checkModel": "model {{model}}",
+    "checkedAt": "checked {{date}}",
+    "checkPending": "The automated check is still running — the corpus fragments collected so far are listed below.",
+    "balanceTableTitle": "Evidence balance",
+    "b": {
+      "total": "Total fragments",
+      "docs": "Documents",
+      "for": "For",
+      "against": "Against",
+      "context": "Context"
+    },
+    "forSub": "Supporting evidence",
+    "againstSub": "Contradicting evidence",
+    "noAgainst": "No contradicting fragments found in the corpus.",
+    "moreQuotes": "{{count}} more supporting fragments are available in the system.",
+    "contextCount": "Additionally, {{count}} context fragments were considered.",
+    "externalSub": "External publications (world practice)",
+    "sec4Title": "Verification plan",
+    "metricsLead": "Metrics:",
+    "criteriaLead": "Success criteria:",
+    "horizonLine": "Verification horizon: {{horizon}}.",
+    "roadmapSub": "Experiment roadmap",
+    "processTableTitle": "Process parameters",
+    "pl": {
+      "materials": "Materials and reagents",
+      "characterization": "Characterization methods",
+      "tests": "Test methods",
+      "controls": "Control samples"
+    },
+    "resourcesLine": "Resource estimate: cost — {{cost}}, time — {{time}}.",
+    "risksLead": "Risks and failure modes:",
+    "planModel": "model {{model}}",
+    "feasibilityTableTitle": "Feasibility assessment",
+    "f": {
+      "aspect": "Aspect",
+      "level": "Level",
+      "note": "Note"
+    },
+    "level": {
+      "low": "low",
+      "medium": "medium",
+      "high": "high"
+    },
+    "sec5Title": "World practice and limitations",
+    "competitorsTableTitle": "Analogues and competing approaches",
+    "co": {
+      "name": "Name",
+      "approach": "Approach",
+      "maturity": "Maturity",
+      "source": "Source"
+    },
+    "limitationsLead": "Applicability limitations:",
+    "conclusionTitle": "Conclusion",
+    "conclVerdict": "Automated check verdict: {{verdict}} ({{forCount}} for, {{againstCount}} against).",
+    "conclVerdictPending": "The automated corpus check is not finished — the verdict will be refined.",
+    "conclReadiness": "Readiness: TRL {{trl}}; technology index {{itc}}.",
+    "conclPriority": "Portfolio priority: {{score}}/100; top factor — {{factor}}.",
+    "conclRisk": "Key risk: {{risk}}",
+    "conclLearning": "Value of further testing (active learning): {{score}}.",
+    "recommendationLead": "Recommendation: {{rec}}.",
+    "recApprove": "proceed per the verification plan",
+    "recReject": "reject and record the reason",
+    "recReview": "investigate further before an expert decision",
+    "recReviewMissing": "investigate further: {{missing}}",
+    "recDecide": "expert decision required",
+    "effectLine": "Expected effect: {{effect}}.",
+    "referencesTitle": "References",
+    "internalDoc": "{{filename}}. — Hypothesis Factory knowledge-base document",
+    "internalSections": "sec.: {{sections}}",
+    "pages": "pp. {{pages}}",
+    "appendixTitle": "Appendix A. Generation details",
+    "g": {
+      "kind": "Generation mode",
+      "model": "Model",
+      "mediators": "Mediator documents",
+      "scores": "Generation scores",
+      "noveltyGate": "Novelty gate",
+      "nearest": "nearest document: {{file}}",
+      "fallback": "Fallback reason"
+    },
+    "genKindBridge": "bridge between themes",
+    "genKindCluster": "from a corpus theme",
+    "genKindOnDemand": "on demand (from a goal)",
+    "genKindFallback": "fallback generation",
+    "genKindUnknown": "manual / unknown",
+    "historyTableTitle": "Change history",
+    "h": {
+      "no": "#",
+      "date": "Date",
+      "action": "Action",
+      "comment": "Comment"
+    },
+    "systemLink": "Full source fragments, the hypothesis graph and history are available in the system: {{path}}",
+    "fileName": "hypothesis-report-{{id}}.docx",
+    "tableCaption": "Table {{n}} — {{title}}",
+    "backToHypothesis": "Back to hypothesis",
+    "conclReadinessTrlOnly": "Readiness: TRL {{trl}}."
+  }
+}

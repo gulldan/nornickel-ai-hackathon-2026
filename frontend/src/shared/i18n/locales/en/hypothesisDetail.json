@@ -1,0 +1,429 @@
+{
+  "page": {
+    "loadingHypothesis": "Loading the hypothesis",
+    "loadingDirection": "Loading the direction",
+    "errorHypothesis": "Failed to load the hypothesis",
+    "errorDirection": "Failed to load the direction"
+  },
+  "actions": {
+    "back": "Back",
+    "collapse": "Collapse",
+    "showFull": "Show in full",
+    "update": "Update",
+    "approve": "Approve",
+    "sendToReview": "Send for review",
+    "reject": "Reject",
+    "addComment": "Add comment",
+    "refine": "Improve (AI agents)",
+    "refining": "Improving…",
+    "statusUpdated": "Status updated",
+    "statusUpdateFailed": "Failed to update the status",
+    "commentAdded": "Comment added",
+    "commentAddFailed": "Failed to add the comment"
+  },
+  "verdicts": {
+    "supported": "Supported",
+    "refuted": "Refuted",
+    "mixed": "Partially supported",
+    "insufficient": "Insufficient data"
+  },
+  "panels": {
+    "ranking": "Why it ranks high",
+    "trl": "Technology readiness",
+    "verification": "Knowledge-base check",
+    "hypothesis": "Hypothesis",
+    "materials": "Materials science passport",
+    "mechanism": "Mechanism (causal chain)",
+    "experiment": "Experiment plan",
+    "feasibility": "Feasibility",
+    "evidence": "Evidence from documents",
+    "details": "Details",
+    "competitors": "Competitors",
+    "specialties": "Scientific specialties",
+    "expertDecision": "Expert decision",
+    "history": "Change history",
+    "direction": "Direction",
+    "directionDocuments": "Direction documents",
+    "context": "Context",
+    "directionScores": "Direction assessment",
+    "nextStep": "Next step",
+    "sources": "Sources",
+    "whatIs": "What “{{title}}” means"
+  },
+  "hero": {
+    "scientific": "scientific",
+    "owner": "Author: {{name}}",
+    "directionNote": "This is a promising direction from the knowledge base, not a verified hypothesis. Use it as a hint on where to dig."
+  },
+  "trl": {
+    "scaleName": "TRL scale · GOST R 58048-2017",
+    "byLevels": "Level-by-level assessment",
+    "level": "TRL {{level}}",
+    "autoPending": "TRL is computed automatically",
+    "autoDone": "TRL computed",
+    "autoPendingNote": "The system will apply the GOST scale and update the card by itself.",
+    "autoDoneNote": "The level and its rationale are ready for expert review."
+  },
+  "verification": {
+    "confidencePct": "confidence {{value}}%",
+    "aiNote": "An AI estimate based on the knowledge base — not a final scientific conclusion",
+    "queued": "The hypothesis has been queued for automatic checking against the knowledge base.",
+    "done": "Check completed",
+    "pending": "Check runs automatically",
+    "doneNote": "The verdict, support and contradictions have been collected.",
+    "pendingNote": "The system will gather evidence, support and refutations by itself.",
+    "basedOn": "Based on: {{basis}}",
+    "checkFragments_one": "{{count}} check fragment",
+    "checkFragments_other": "{{count}} check fragments",
+    "checkedAt": "checked {{date}}"
+  },
+  "confidence": {
+    "unverified": "Not verified",
+    "unverifiedNote": "Not enough data — the scores below are indicative; do not treat the hypothesis as confirmed.",
+    "fragmentsFor": "Fragments for: {{count}}",
+    "fragmentsAgainst": "Fragments against: {{count}}"
+  },
+  "schema": {
+    "incomplete": "Hypothesis incomplete",
+    "missing": "missing: {{list}}"
+  },
+  "scoreboard": {
+    "title": "Hypothesis assessment",
+    "hint": "Click a metric to see the explanation",
+    "details": "Assessment details",
+    "noDetail": "No explanation computed for this metric yet.",
+    "trl": "Readiness (TRL)",
+    "trlChip": "TRL {{level}}/9",
+    "itc": "Tech index",
+    "outOf": "of {{max}}",
+    "queued": "queued",
+    "forAgainst": "{{for}} for · {{against}} against"
+  },
+  "nav": {
+    "title": "On this page",
+    "mechanism": "Mechanism"
+  },
+  "materials": {
+    "system": "System",
+    "composition": "Composition",
+    "process": "Process",
+    "microstructure": "Microstructure",
+    "targetProperty": "Target property",
+    "characterization": "Characterization",
+    "tests": "Testing",
+    "failureRisks": "Failure risks"
+  },
+  "ranking": {
+    "priority": "Validation priority",
+    "explainer": "The final score is computed by the service with fixed weights. The model only extracts features from the knowledge base.",
+    "factor": "Factor",
+    "contribution": "Contribution",
+    "weight": "Weight",
+    "notScored": "not scored",
+    "expertDecision": "Expert decision: {{label}}",
+    "formula": "Formula: {{formula}}"
+  },
+  "novelty": {
+    "title": "Novelty",
+    "why": "Why this novelty score"
+  },
+  "freshness": {
+    "title": "Topic freshness"
+  },
+  "learning": {
+    "title": "What to test next",
+    "titleHintLabel": "What “What to test next” means",
+    "titleHint": "How much testing this hypothesis would advance knowledge: it combines potential value, uncertainty and the lack of data. The higher, the more useful it is to test this one.",
+    "breakdown": "What it consists of",
+    "value": "Potential value",
+    "valueHint": "What we gain if the hypothesis is confirmed.",
+    "uncertainty": "Uncertainty",
+    "uncertaintyHint": "How unclear the outcome still is — the higher, the more we learn by testing.",
+    "evidenceGap": "Lack of data",
+    "evidenceGapHint": "How thin the evidence base is: less data means a higher payoff from testing."
+  },
+  "causal": {
+    "step": "Step",
+    "composition": "Composition",
+    "process": "Process",
+    "microstructure": "Microstructure",
+    "property": "Property",
+    "feed": "Feed",
+    "operation": "Operation",
+    "regime": "Operating mode",
+    "indicator": "Indicator",
+    "kpi": "Goal"
+  },
+  "experiment": {
+    "taskTitle": "Drafting the experiment plan",
+    "taskSuccess": "Experiment plan drafted",
+    "taskFailed": "Failed to draft the experiment plan",
+    "composing": "Drafting…",
+    "updatePlan": "Update plan",
+    "createPlan": "Draft experiment plan",
+    "aiNote": "The plan is suggested by AI from the knowledge base — review it before running",
+    "empty": "No plan yet. Draft one — materials, process parameters, measurement methods, controls and a success criterion — so the hypothesis can be tested in the lab.",
+    "planType": "Plan type: {{type}}",
+    "stagesDetail": "Stage details ({{count}})",
+    "stage": "Stage {{n}}",
+    "materials": "Materials",
+    "variables": "Variables",
+    "processParams": "Process parameters",
+    "charMethods": "Measurement methods",
+    "testMethods": "Test methods",
+    "methods": "Methods",
+    "controls": "Controls",
+    "successCriterion": "Success criterion",
+    "risks": "Risks",
+    "costEstimate": "Cost estimate: {{value}}",
+    "timeEstimate": "Time estimate: {{value}}",
+    "cost": {
+      "low": "low",
+      "medium": "medium",
+      "high": "high"
+    },
+    "time": {
+      "days": "days",
+      "weeks": "weeks",
+      "months": "months"
+    },
+    "type": {
+      "new_alloy": "new alloy",
+      "process_route": "process route",
+      "coating_corrosion": "coating and corrosion",
+      "battery_material": "battery material",
+      "ore_beneficiation": "ore beneficiation",
+      "metallurgy_process": "metallurgical process",
+      "generic": "generic plan"
+    }
+  },
+  "roadmap": {
+    "title": "Validation roadmap",
+    "cost": "Cost: {{value}}",
+    "time": "Time: {{value}}",
+    "materials_one": "{{count}} material",
+    "materials_other": "{{count}} materials",
+    "methods_one": "{{count}} method",
+    "methods_other": "{{count}} methods",
+    "moreCriteria": "{{count}} more"
+  },
+  "feasibility": {
+    "risk": "risk: {{level}}",
+    "low": "low",
+    "medium": "medium",
+    "high": "high"
+  },
+  "evidence": {
+    "role": {
+      "supports": "supports",
+      "contradicts": "contradicts",
+      "context": "context"
+    },
+    "count": {
+      "supports": "support",
+      "contradicts": "contradict",
+      "context": "context"
+    },
+    "relationText": {
+      "supports": "the fragment contains a result or condition that works in favour of the claimed effect.",
+      "contradicts": "the fragment points to a limitation, a negative result or a condition that argues against the claimed effect.",
+      "context": "the fragment provides conditions, methodology or material for testing, but does not by itself prove the effect."
+    },
+    "relationRole": {
+      "theme_a": "represents the first theme of the bridge",
+      "theme_b": "represents the second theme of the bridge",
+      "mediator": "a mediator document connecting the themes"
+    },
+    "relationPrefix": "Relation to the {{subject}}:",
+    "subjectHypothesis": "hypothesis",
+    "subjectDirection": "direction",
+    "numericSignals": "Numeric signals: {{list}}.",
+    "page": "p. {{page}}",
+    "pageRange": "pp. {{start}}–{{end}}",
+    "empty": "No evidence found yet.",
+    "unnamedDocument": "document",
+    "documentFallback": "Document",
+    "docsWithFragment_one": "document with a cited fragment",
+    "docsWithFragment_other": "documents with cited fragments",
+    "fragmentsBare_one": "fragment",
+    "fragmentsBare_other": "fragments",
+    "fragments_one": "{{count}} fragment",
+    "fragments_other": "{{count}} fragments",
+    "documents_one": "{{count}} document",
+    "documents_other": "{{count}} documents",
+    "sourceDocs_one": "{{count}} document",
+    "sourceDocs_other": "{{count}} documents",
+    "openDocTitle": "Open the document and highlight the passage",
+    "collapseFragments": "Collapse fragments",
+    "expandFragments": "Show fragments",
+    "emptyFragment": "fragment without text",
+    "showAll": "Show all articles ({{count}})",
+    "fromInput": "From your data",
+    "filterHint": "Show only these documents",
+    "filterReset": "show all"
+  },
+  "competitors": {
+    "taskTitle": "Competitor analysis",
+    "found": "Competitors found: {{count}}",
+    "noneFound": "No competitors found in the knowledge base",
+    "taskFailed": "Failed to analyze competitors",
+    "analyzing": "Analyzing…",
+    "findInBase": "Search the knowledge base",
+    "strengths": "Strengths",
+    "weaknesses": "Weaknesses",
+    "notFound": "No competitors found in the knowledge base.",
+    "notStarted": "Analysis has not been run yet."
+  },
+  "refine": {
+    "taskTitle": "Improving the hypothesis",
+    "taskSuccess": "The hypothesis was checked and refined where needed",
+    "taskFailed": "Failed to improve the hypothesis"
+  },
+  "tags": {
+    "taskTitle": "Auto-tagging the hypothesis",
+    "taskSuccess": "Tags and research type identified",
+    "taskFailed": "Failed to identify tags",
+    "determining": "Identifying…",
+    "determine": "Identify",
+    "aiNote": "Tags identified by AI from the knowledge base",
+    "empty": "Specialties (GRNTI / VAK / Scopus) have not been identified yet."
+  },
+  "fields": {
+    "rationale": "Rationale",
+    "problem": "Problem addressed",
+    "drivers": "Efficiency drivers",
+    "driversShort": "Drivers",
+    "applicationPotential": "Application potential",
+    "application": "Application",
+    "areas": "Areas",
+    "howToVerify": "How to verify",
+    "metrics": "Metrics: {{list}}",
+    "quantParams": "Quantitative parameters",
+    "whyHighlighted": "Why it stands out"
+  },
+  "expert": {
+    "commentPlaceholder": "Expert comment…",
+    "summaryApproved": "Approved by expert",
+    "summaryReview": "Sent for review",
+    "summaryRejected": "Rejected by expert"
+  },
+  "history": {
+    "system": "system"
+  },
+  "direction": {
+    "taskTitle": "Generating hypotheses",
+    "taskDescription": "Direction: {{title}}",
+    "created": "Hypotheses created: {{count}}",
+    "taskFailed": "Failed to generate hypotheses",
+    "updatedAt": "updated {{date}}",
+    "noDescription": "The direction has no description yet.",
+    "aiNote": "This is a search area from the knowledge base. Testable hypotheses are generated as a separate step.",
+    "generate": "Generate hypotheses",
+    "generating": "Generating...",
+    "itcTitle": "Direction technology index",
+    "itcCitations": "citations in the direction",
+    "sourcesSummary": "{{fragments}} from {{documents}}."
+  },
+  "scores": {
+    "value": "Potential",
+    "novelty": "Novelty",
+    "risk": "Risk"
+  },
+  "itc": {
+    "title": "Technology index",
+    "whatIs": "What the technology index is",
+    "badge": "Technology index {{score}}/10",
+    "ringTitle": "Technology index {{score}}/10 · {{band}}",
+    "outOf10": "out of 10",
+    "comp": {
+      "SM": "Research activity",
+      "NV": "Novelty",
+      "IP": "Impact",
+      "HR": "Maturity"
+    },
+    "citationsHypotheses": "citations in hypotheses",
+    "computedPrefix": "Computed from the knowledge base:",
+    "pubYears": "publications {{span}}",
+    "pubCount_one": "{{count}} paper",
+    "pubCount_other": "{{count}} papers",
+    "deterministic": "deterministic, no AI judgement"
+  },
+  "provenance": {
+    "title": "How it originated",
+    "fallback": "The model was unavailable — the draft was assembled from retrieved fragments without generation.",
+    "bridgeIntro": "The system found a “bridge”: two knowledge-base themes are semantically close yet almost unconnected directly — and proposed a hypothesis at their intersection.",
+    "themeA": "Theme A",
+    "themeB": "Theme B",
+    "mediators": "Mediator documents · {{count}}",
+    "openMediator": "Open the mediator document",
+    "scaleValue": "{{label}}: {{value}} out of 100",
+    "scales": {
+      "maverick": "Unexpectedness of the link",
+      "maverickHint": "The themes are semantically close yet almost unlinked directly — a sign of a non-obvious idea",
+      "bridging": "Strength of mediators",
+      "bridgingHint": "How strongly the mediator documents actually connect the themes",
+      "affinity": "Semantic affinity of themes",
+      "affinityHint": "How much the themes are about the same thing at all"
+    },
+    "convergenceLabel": "Convergence:",
+    "convergencePaths_one": "independent path between the themes",
+    "convergencePaths_other": "independent paths between the themes",
+    "gatesTitle": "Checks before publication",
+    "gateConvergence_one": "Link confirmed by {{shown}} independent path",
+    "gateConvergence_other": "Link confirmed by {{shown}} independent paths",
+    "gateRequired": "(needs ≥{{required}})",
+    "gateGrounding": "All evidence cites real documents from the base",
+    "gateNovelty": "Does not duplicate known work",
+    "noveltySimBefore": ": the closest similar text matches at",
+    "noveltyThreshold": "(threshold {{value}} %)",
+    "openNearest": "open the nearest document",
+    "wording": "wording: {{model}}",
+    "clusterWithLabel": "Assembled automatically from the theme “{{label}}” — as reconnaissance of a promising area, not a verified claim.",
+    "clusterNoLabel": "Assembled automatically from a knowledge-base theme — as reconnaissance of a promising area, not a verified claim.",
+    "onDemand": "Generated for a goal from knowledge-base fragments: the system retrieved relevant documents, extracted mechanisms and assembled a testable claim.",
+    "constraints": "Constraints taken into account:",
+    "model": "model: {{model}}",
+    "worldPractice": "World practice (open publications)"
+  },
+  "edit": {
+    "open": "Edit",
+    "dialogTitle": "Edit hypothesis",
+    "dialogDescription": "Changes are recorded in the revision history.",
+    "title": "Title",
+    "statement": "Statement",
+    "rationale": "Rationale",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saved": "Hypothesis updated",
+    "saveFailed": "Failed to save the edit",
+    "revisionSummary": "Expert text edit"
+  },
+  "roadmapEdit": {
+    "open": "Edit",
+    "dialogTitle": "Edit roadmap",
+    "dialogDescription": "Stages, success criteria and resource estimates. Changes are recorded in the revision history.",
+    "stage": "Stage {{n}}",
+    "stageTitle": "Stage title",
+    "stagePurpose": "Stage purpose",
+    "stageItems": "Actions/resources — one per line",
+    "addStage": "Add stage",
+    "removeStage": "Remove stage",
+    "criteria": "Success criteria (one per line)",
+    "criteriaPlaceholder": "E.g.: heat resistance improved by at least 15%",
+    "cost": "Cost",
+    "time": "Time",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saved": "Roadmap updated",
+    "saveFailed": "Failed to save the roadmap",
+    "revisionSummary": "Expert roadmap edit"
+  },
+  "export": {
+    "menu": "Export",
+    "word": "Word report (DOCX)",
+    "pdf": "Printable report (PDF)",
+    "loading": "Building the Word report…",
+    "ready": "Word report downloaded",
+    "error": "Couldn’t build the Word file"
+  }
+}

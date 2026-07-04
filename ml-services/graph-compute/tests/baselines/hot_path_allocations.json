@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "scenarios": [
+    {
+      "name": "aggregate_docs.synthetic",
+      "description": "Per-chunk normalize + weighted pooling of 40 docs × 4 chunks.",
+      "max_allocations": 1086,
+      "max_reallocations": 1285,
+      "max_allocated_bytes": 304852,
+      "observed_allocations": 1086,
+      "observed_reallocations": 1285,
+      "observed_allocated_bytes": 304852
+    },
+    {
+      "name": "build_knn_maps.synthetic",
+      "description": "Blocked exact top-k cosine neighbours over the pooled document vectors.",
+      "max_allocations": 1,
+      "max_reallocations": 0,
+      "max_allocated_bytes": 5440,
+      "observed_allocations": 1,
+      "observed_reallocations": 0,
+      "observed_allocated_bytes": 5440
+    },
+    {
+      "name": "build_graph.synthetic",
+      "description": "Mutual-kNN weighted graph build with isolated-node reattachment.",
+      "max_allocations": 50,
+      "max_reallocations": 40,
+      "max_allocated_bytes": 15524,
+      "observed_allocations": 50,
+      "observed_reallocations": 40,
+      "observed_allocated_bytes": 15524
+    }
+  ]
+}

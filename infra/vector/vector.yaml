@@ -1,0 +1,22 @@
+# Vector log collector. Tails all container logs via the Docker socket and emits
+# them as structured JSON. In production point the sink at Loki/Elasticsearch/S3;
+# here it prints to stdout so you can see the unified stream. Enable with:
+#   docker compose --profile logging up -d vector
+sources:
+  docker:
+    type: docker_logs
+
+transforms:
+  tag:
+    type: remap
+    inputs: [docker]
+    source: |
+      .platform = "rag"
+      .service = .container_name
+
+sinks:
+  stdout:
+    type: console
+    inputs: [tag]
+    encoding:
+      codec: json

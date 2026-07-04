@@ -1,0 +1,372 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://demo-rag/schemas/hypothesis/v1/hypothesis.schema.json",
+  "title": "Hypothesis",
+  "description": "Проверяемая исследовательская гипотеза. Схема используется как формат ответа LLM, контракт API и основа сопоставления с таблицами db-service. Простые поля пишутся в колонки. Вложенные поля пишутся в JSONB. Evidence пишется в hypothesis_evidence. Enum-поля должны совпадать с SQL CHECK.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "title",
+    "statement",
+    "rationale",
+    "method",
+    "measurable",
+    "trl",
+    "assessment",
+    "verification",
+    "evidence"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "UUID, который назначает сервер. При генерации не заполнять.",
+      "readOnly": true
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "Владелец запуска. Сервер берет значение из контекста запроса.",
+      "readOnly": true
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Идентификатор пакета генерации. Сервер заполняет сам.",
+      "readOnly": true
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Короткое и конкретное название гипотезы для карточки."
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Проверяемое утверждение. Лучше писать конкретно: изменение X при условиях Y изменит KPI Z. Конкретика и числа повышают TRL."
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Обоснование. Нужно объяснить, почему гипотеза следует из KPI и найденных источников. Логика должна быть проверяемой."
+    },
+    "method": {
+      "type": "string",
+      "description": "Способ появления гипотезы. cluster_kpi означает связь темы корпуса с KPI. transfer означает перенос из близкого контекста. gap означает вывод из пробела или противоречия. combination означает соединение нескольких тем. manual означает ручной ввод эксперта.",
+      "enum": ["cluster_kpi", "transfer", "gap", "combination", "manual"]
+    },
+    "status": {
+      "type": "string",
+      "description": "Состояние жизненного цикла. Генерация обычно создает generated. Остальные статусы меняет экспертный процесс.",
+      "enum": ["draft", "generated", "under_review", "approved", "rejected", "archived"],
+      "default": "generated"
+    },
+    "kpi": {
+      "$ref": "#/$defs/kpiRef",
+      "description": "Снимок KPI, на который направлена гипотеза."
+    },
+    "clusters": {
+      "type": "array",
+      "description": "Исходные темы корпуса. Первая тема считается основной.",
+      "items": { "$ref": "#/$defs/clusterRef" }
+    },
+    "trl": { "$ref": "#/$defs/trlAssessment" },
+    "assessment": { "$ref": "#/$defs/assessment" },
+    "measurable": {
+      "type": "boolean",
+      "description": "true, если у гипотезы есть измеримый эффект. Если проверка качественная, поставьте false и опишите критерий проверки."
+    },
+    "verification": { "$ref": "#/$defs/verification" },
+    "quantitative_parameters": {
+      "type": "array",
+      "description": "Числа, связанные с гипотезой. Например плотность 10 г/см3 или рост извлечения на 15 процентов. Каждое обоснованное число повышает TRL.",
+      "items": { "$ref": "#/$defs/quantitativeParameter" }
+    },
+    "problem_addressed": {
+      "type": "string",
+      "description": "На какую проблематику направлено решение."
+    },
+    "application_potential": { "$ref": "#/$defs/applicationPotential" },
+    "drivers": {
+      "type": "array",
+      "description": "Драйверы эффективности. Укажите, почему решение может сработать.",
+      "items": { "type": "string" }
+    },
+    "domain": { "$ref": "#/$defs/domainFacets" },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Источники из корпуса. Они могут поддерживать гипотезу, противоречить ей или давать контекст. Нужен хотя бы один источник в пользу.",
+      "items": { "$ref": "#/$defs/evidenceItem" }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Свободные метки для фильтров доски."
+    },
+    "generation": {
+      "$ref": "#/$defs/generation",
+      "description": "Происхождение гипотезы: модель, входные данные и след рассуждения. Обычно заполняет сервер или модель.",
+      "readOnly": true
+    },
+    "composite_score": {
+      "type": "number",
+      "description": "Итоговый рейтинг. Его считает сервис, а не LLM.",
+      "readOnly": true
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true }
+  },
+  "$defs": {
+    "scoredDimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "rationale"],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Нормированная оценка от 0 до 1."
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Проверяемое объяснение оценки."
+        },
+        "criteria": {
+          "type": "array",
+          "description": "Необязательная разбивка оценки по критериям.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "met"],
+            "properties": {
+              "name": { "type": "string" },
+              "met": { "type": "boolean" },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "riskDimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "rationale"],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Риск от 0 до 1. Чем выше значение, тем выше риск."
+        },
+        "level": {
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "description": "Понятный уровень риска, рассчитанный по score."
+        },
+        "factors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Конкретные факторы риска: техника, экономика, безопасность, данные."
+        },
+        "rationale": { "type": "string", "minLength": 3 }
+      }
+    },
+    "trlAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "rationale"],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9,
+          "description": "Уровень готовности технологии от 1 до 9. Общие формулировки получают низкий уровень. Конкретные и подтвержденные числами получают уровень выше."
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Обоснование уровня. Укажите, что повышает готовность и что ее ограничивает."
+        },
+        "signals": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Признаки зрелости: пилоты, измеренные числа, применение в поле."
+        }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["novelty", "risk", "value", "confidence"],
+      "description": "Четыре оцениваемых измерения. Числовые score проецируются в колонки. Полные объекты хранятся в assessment JSONB.",
+      "properties": {
+        "novelty": {
+          "$ref": "#/$defs/scoredDimension",
+          "description": "Новизна относительно корпуса и известных решений. 1 означает высокую новизну."
+        },
+        "risk": { "$ref": "#/$defs/riskDimension" },
+        "value": {
+          "$ref": "#/$defs/scoredDimension",
+          "description": "Потенциальная ценность для KPI. 1 означает высокую ценность."
+        },
+        "confidence": {
+          "$ref": "#/$defs/scoredDimension",
+          "description": "Уверенность, что гипотезу стоит проверять."
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method"],
+      "description": "Как проверить гипотезу. Поле обязательно даже для качественной проверки.",
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "Эксперимент, анализ или пилот, который подтвердит или опровергнет гипотезу."
+        },
+        "metrics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Что измерять. Может быть пустым, если measurable=false."
+        },
+        "success_criteria": { "type": "string" },
+        "horizon": {
+          "type": "string",
+          "description": "Ориентировочный срок. Например 6 месяцев или к 2030 году."
+        },
+        "estimated_cost": { "type": "string" }
+      }
+    },
+    "quantitativeParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "number" },
+        "unit": { "type": "string" },
+        "role": {
+          "type": "string",
+          "enum": ["target", "observed", "threshold", "assumption"],
+          "description": "Что означает число."
+        }
+      }
+    },
+    "applicationPotential": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Потенциал применения и объекты.",
+      "properties": {
+        "objects": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Где можно применить решение: активы, типы объектов или процессы."
+        },
+        "conditions": { "type": "string" },
+        "constraints": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "domainFacets": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Фасеты доски. Они дублируются в колонки для фильтров.",
+      "properties": {
+        "organization": {
+          "type": "string",
+          "description": "Компания или организация, к которой относится источник."
+        },
+        "function": {
+          "type": "string",
+          "description": "Функциональная область. Значение пишется в колонку function_area."
+        },
+        "source_type": {
+          "type": "string",
+          "enum": ["literature", "patent", "standard", "report", "experiment", "news", "internal", "other"],
+          "description": "Тип источника, на котором основана гипотеза."
+        },
+        "location": { "type": "string" }
+      }
+    },
+    "evidenceItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snippet", "stance"],
+      "description": "Одна ссылка на источник. Соответствует строке hypothesis_evidence.",
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "description": "Идентификатор документа из documents.id."
+        },
+        "chunk_id": {
+          "type": "string",
+          "description": "Идентификатор фрагмента в Qdrant и OpenSearch. Может быть пустым для ссылки на весь документ."
+        },
+        "filename": { "type": "string" },
+        "snippet": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Точный фрагмент из корпуса без пересказа. По нему можно проверить утверждение."
+        },
+        "stance": {
+          "type": "string",
+          "enum": ["supports", "contradicts", "context"],
+          "description": "Показывает позицию фрагмента: поддерживает, противоречит или дает контекст."
+        },
+        "score": {
+          "type": "number",
+          "description": "Оценка релевантности найденного фрагмента."
+        }
+      }
+    },
+    "kpiRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "metric": { "type": "string" },
+        "unit": { "type": "string" },
+        "target": { "type": "number" }
+      }
+    },
+    "clusterRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" }
+      }
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "model": { "type": "string" },
+        "prompt_version": { "type": "string" },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "kpi_id": { "type": "string" },
+            "cluster_ids": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "reasoning_trace": {
+          "type": "string",
+          "description": "Необязательный след рассуждения для объяснимости."
+        },
+        "generated_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

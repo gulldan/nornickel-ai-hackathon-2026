@@ -1,0 +1,63 @@
+{
+  "header": {
+    "kicker": "Knowledge base",
+    "title": "Topics",
+    "hintLabel": "What is a topic",
+    "withCount_one": "{{count}} topic — groups of similar documents scored for novelty and maturity.",
+    "withCount_other": "{{count}} topics — groups of similar documents scored for novelty and maturity.",
+    "empty": "Groups of similar documents from the knowledge base, scored for novelty and maturity."
+  },
+  "loading": "Loading topics",
+  "error": "Failed to load topics",
+  "map": {
+    "title": "Topic map",
+    "description": "Each circle is a theme; its size is the theme's share of documents. Position is relative to the other themes of your base: further right — more mature and active, higher — more novelty and potential. Hover for details, click to open the theme.",
+    "pending": "Technology scoring is in progress — the novelty-and-maturity map will appear after the first computation (usually within an hour). Topics are already available in the list below.",
+    "awaiting_one": "{{count}} more topic awaits scoring:",
+    "awaiting_other": "{{count}} more topics await scoring:",
+    "aria": "Topic map: further right — more mature, higher — more potential",
+    "axisX": "Maturity and scale →",
+    "axisY": "Potential ↑",
+    "quadrantNew": "New directions",
+    "quadrantLeaders": "Rising leaders",
+    "quadrantFading": "Fading",
+    "quadrantMature": "Mature areas",
+    "openTheme": "{{label}} — open topic"
+  },
+  "stats": "{{docs}} docs · {{chunks}} fragments",
+  "hover": {
+    "techScore": "technology index {{score}}/10",
+    "maturity": "Maturity and scale",
+    "potential": "Potential",
+    "open": "Click to open the topic"
+  },
+  "sort": {
+    "tech": "Most technological first",
+    "size": "Largest first",
+    "fresh": "Recently updated first"
+  },
+  "section": {
+    "all": "All topics"
+  },
+  "empty": {
+    "title": "No topics yet",
+    "description": "Topics will appear once documents are processed — similar materials group together automatically."
+  },
+  "filters": {
+    "searchPlaceholder": "Search by title, keywords, description",
+    "searchAria": "Search topics",
+    "sortAria": "Sort topics",
+    "scoredOnly": "With technology score",
+    "reset": "Reset"
+  },
+  "noResults": {
+    "title": "Nothing found",
+    "description": "No topics match the current search and filters. Change the query or reset the filters.",
+    "resetFilters": "Reset filters"
+  },
+  "list": {
+    "range": "{{from}}–{{to}} of {{total}}",
+    "totalNote": "(total topics: {{count}})",
+    "techBadge": "Technology index {{score}}/10"
+  }
+}

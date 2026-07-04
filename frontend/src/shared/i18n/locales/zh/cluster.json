@@ -1,0 +1,38 @@
+{
+  "back": "返回",
+  "loading": "正在加载主题",
+  "errorNotFound": "未找到主题",
+  "errorLoad": "无法加载主题",
+  "untitled": "未命名主题",
+  "kicker": "主题",
+  "meta": {
+    "documents_other": "{{count}} 篇文档",
+    "fragments_other": "{{count}} 个片段",
+    "updated": "更新于 {{date}}"
+  },
+  "density": {
+    "label": "主题密度",
+    "hint": "主题内文档在语义上的接近程度：越紧密，主题越均匀。基于文档向量计算，不涉及 AI。",
+    "bar": "密度 {{percent}} %"
+  },
+  "lineage": {
+    "merged": "该主题由上次知识库更新时的 {{count}} 个旧主题合并而成",
+    "split": "该主题在知识库更新时从更大的主题中分出",
+    "unchanged": "自上次知识库更新以来主题构成未变",
+    "continues": "该主题延续此前主题：构成重合度为 {{percent}} %"
+  },
+  "itc": {
+    "title": "主题技术性指数",
+    "citations": "主题内引用次数"
+  },
+  "docsSection": "主题文档",
+  "generate": "按主题生成假设",
+  "generating": "生成中…",
+  "task": {
+    "title": "假设生成",
+    "theme": "主题：{{label}}",
+    "success": "主题“{{label}}”：已创建 {{count}} 条",
+    "error": "无法生成假设",
+    "fallbackLabel": "主题"
+  }
+}

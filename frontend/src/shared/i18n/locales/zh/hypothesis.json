@@ -1,0 +1,599 @@
+{
+  "board": {
+    "kicker": "组合",
+    "title": "假设",
+    "whatIsHypothesis": "什么是假设",
+    "description": "面向您目标的可验证研发假设：机理、证据、风险、价值和实验方案。",
+    "searchPlaceholder": "按技术、效果、地点搜索",
+    "searchAria": "搜索假设",
+    "facetCompany": "应用领域",
+    "facetFunc": "获取方式",
+    "facetSource": "来源类型",
+    "facetTrlAll": "任意成熟度",
+    "facetResearchAll": "任意类型",
+    "allGoals": "全部目标",
+    "reset": "重置",
+    "resetFilters": "重置筛选",
+    "range": "第 {{from}}–{{to}} 条，共 {{total}} 条",
+    "rangeFiltered": "（已筛选，本标签页共 {{total}} 条）",
+    "loadError": "无法加载假设",
+    "loadRefsError": "无法加载参考数据",
+    "loadPageError": "无法加载下一页",
+    "emptyFiltered": "当前筛选条件下没有结果。请修改搜索条件或重置筛选。",
+    "emptyQueue": "该队列暂时为空 — 请在上方选择其他队列。",
+    "facetSearch": "查找值…",
+    "facetNothing": "未找到",
+    "facetReset": "清除筛选",
+    "facetTrl": "成熟度（TRL）",
+    "facetResearch": "研究类型",
+    "facetGoal": "目标",
+    "chipRemove": "移除筛选：{{value}}"
+  },
+  "tabs": {
+    "hypotheses": "假设",
+    "directions": "知识库建议",
+    "drafts": "草稿",
+    "graph": "来源关联",
+    "methodology": "方法论"
+  },
+  "tabHints": {
+    "hypotheses": "假设是基于您知识库文档构建的、关于「改进什么、如何改进」的可验证推断。系统会自动依据知识库核验每条假设并评估技术成熟度 — 卡片自动更新。",
+    "directions": "方向是系统在知识库主题中自动发现的有前景的研究领域。它是选择目标的提示：可以从方向生成具体的假设。",
+    "drafts": "草稿是暂时缺少知识库佐证的假设雏形。可以将其完善为完整假设，也可以删除。",
+    "graph": "知识图谱展示每条假设依据哪些文档：绿色连线表示支持，红色表示反驳。共同的文档将相关的假设连接起来。",
+    "methodology": "系统如何逐步创建、核验和评估假设。"
+  },
+  "empty": {
+    "hypotheses": {
+      "title": "暂无假设",
+      "text": "创建目标并启动生成 — 假设将连同证据和评分出现在这里。"
+    },
+    "directions": {
+      "title": "暂无方向",
+      "text": "方向由知识库主题自动汇集。上传更多文档 — 系统就会发现有前景的领域。"
+    },
+    "drafts": {
+      "title": "没有草稿",
+      "text": "被否决和未完成的假设会归入此处。目前没有 — 一切都在「假设」标签页中进行。"
+    }
+  },
+  "queues": {
+    "all": {
+      "label": "全部",
+      "hint": "全部假设组合"
+    },
+    "needsVerify": {
+      "label": "审核中",
+      "hint": "系统正在收集正反论据"
+    },
+    "ready": {
+      "label": "就绪",
+      "hint": "可以规划实验"
+    },
+    "risk": {
+      "label": "存在矛盾",
+      "hint": "存在反驳论据 — 需要分析"
+    },
+    "insufficient": {
+      "label": "证据不足",
+      "hint": "验证已完成：语料库中支持或反对的证据都太少。不会自动变化——请添加来源后重新核查、优化表述，或手动关闭。"
+    }
+  },
+  "sorts": {
+    "rank": "最值得验证",
+    "learning": "下一步验证什么",
+    "itc": "按技术指数",
+    "novelty": "按新颖性",
+    "trl": "按成熟度",
+    "recent": "最新优先"
+  },
+  "actions": {
+    "export": "导出",
+    "exportCsv": "CSV（Excel）",
+    "exportJson": "JSON（集成）",
+    "exportPdf": "打印报告（PDF）",
+    "digest": "简报",
+    "generate": "生成假设",
+    "exportJira": "Jira CSV",
+    "exportTasks": "任务 JSON（跟踪器）",
+    "exportDocx": "Word 报告（DOCX）"
+  },
+  "generate": {
+    "title": "生成假设",
+    "description": "系统将研读知识库文档，提出实现所选目标的可验证途径。",
+    "goal": "目标",
+    "newGoal": "新目标…",
+    "metricLine": "指标：{{value}}",
+    "goalOnly": "将为该目标创建假设。",
+    "goalTitle": "目标名称",
+    "goalTitlePlaceholder": "例如：降低浮选尾矿中的铜损失",
+    "context": "背景（可选）",
+    "contextPlaceholder": "工段、矿石类型及生产特点",
+    "constraints": "约束条件（可选）",
+    "constraintsPlaceholder": "允许与不允许的条件：预算、设备、药剂、销售…",
+    "constraintsHint": "系统不会提出违反这些约束的假设。",
+    "metric": "指标（可选）",
+    "metricPlaceholder": "铜回收率，%",
+    "count": "生成多少条假设",
+    "backgroundNote": "生成在后台进行，约需一到两分钟 — 完成的假设会自动出现在看板上，可以关闭此窗口。",
+    "busy": "生成中…",
+    "taskTitle": "假设生成",
+    "created": "已创建假设：{{n}} 条",
+    "failed": "无法生成假设",
+    "dataNote": "假设基于知识库中的文档生成。可在“文档”页面添加您的报告、流程图和规程。",
+    "dataLink": "上传数据"
+  },
+  "digest": {
+    "dialogTitle": "假设简报（{{n}}）",
+    "dialogDescription": "按所选筛选条件汇总的假设概要 — 可以复制或下载为文件。",
+    "copied": "简报已复制",
+    "downloadMd": "下载 .md",
+    "fileName": "假设简报.md",
+    "heading": "假设简报（{{n}}）",
+    "priority": "优先级 {{n}}/100",
+    "rationale": "论证",
+    "mechanism": "机理",
+    "successCriteria": "成功标准",
+    "scores": "评分",
+    "novelty": "新颖性 {{value}}",
+    "risk": "风险 {{value}}",
+    "value": "价值 {{value}}",
+    "confidence": "置信度 {{value}}"
+  },
+  "export": {
+    "empty": "没有可导出的假设",
+    "csvFileName": "假设.csv",
+    "jsonFileName": "假设.json",
+    "csv": {
+      "title": "标题",
+      "statement": "论断",
+      "priority": "优先级",
+      "trl": "成熟度（TRL）",
+      "novelty": "新颖性",
+      "risk": "风险",
+      "value": "价值",
+      "confidence": "置信度",
+      "organization": "领域",
+      "method": "方法/方向",
+      "source": "来源",
+      "location": "地点",
+      "status": "状态",
+      "tags": "标签"
+    },
+    "jiraFileName": "假设-jira.csv",
+    "tasksFileName": "假设-任务.json",
+    "docxLoading": "正在生成 Word 报告…",
+    "docxReady": "Word 报告已下载",
+    "docxError": "无法生成 Word 文件"
+  },
+  "statuses": {
+    "draft": "草稿",
+    "generated": "已生成",
+    "underReview": "审核中",
+    "approved": "已确认",
+    "rejected": "已否决",
+    "archived": "已归档"
+  },
+  "verdicts": {
+    "supported": "得到支持",
+    "refuted": "被反驳",
+    "mixed": "存在矛盾",
+    "insufficient": "数据不足",
+    "unverified": "未核验"
+  },
+  "origins": {
+    "bridge": "主题间桥接",
+    "topic": "来自主题",
+    "manual": "手动创建",
+    "goal": "按目标"
+  },
+  "badges": {
+    "direction": "方向"
+  },
+  "trl": {
+    "none": "成熟度 —",
+    "value": "成熟度 {{trl}}/9"
+  },
+  "researchTypes": {
+    "theoretical": "理论研究",
+    "practical": "实践研究"
+  },
+  "untitled": "无标题",
+  "schemaFields": {
+    "intervention": "干预措施",
+    "mechanism": "机理",
+    "target": "目标 KPI",
+    "validationPlan": "验证方案"
+  },
+  "confidenceFacets": {
+    "belief": {
+      "label": "对假设的置信度",
+      "hint": "科学语料在多大程度上支持该假设成立。"
+    },
+    "verdict": {
+      "label": "对核验的置信度",
+      "hint": "核验结论本身的可靠程度。"
+    },
+    "evidence": {
+      "label": "证据质量",
+      "hint": "结论所依据来源的可靠程度。"
+    }
+  },
+  "card": {
+    "ratingAria": "评分 {{rank}}/100",
+    "owner": "作者：{{name}}"
+  },
+  "methodology": {
+    "howTitle": "工作原理",
+    "howDescription": "从文档到可验证假设的路径。",
+    "pipeline": {
+      "parsing": {
+        "title": "解析知识库",
+        "text": "文档被切分为片段，清除技术噪声并与来源关联 — 每个结论都可以在文章或报告的具体位置打开。"
+      },
+      "topics": {
+        "title": "主题与方向",
+        "text": "系统将相近片段归组为主题，并自行勾勒方向 — 一张有前景领域的地图。这是对语料的探察，而非已证明的假设。"
+      },
+      "generation": {
+        "title": "面向目标生成假设",
+        "text": "针对目标检索相关片段，提取材料、工艺和性能，形成可验证的链条：改变什么、应用在哪里、用什么指标衡量效果。"
+      },
+      "ranking": {
+        "title": "核验与排序",
+        "text": "评分由透明公式计算：目标契合度、证据强度、新颖性、价值、风险和技术成熟度。专家可以更改状态并完善假设档案。"
+      }
+    },
+    "definitions": {
+      "evidence": {
+        "group": "如何解读证据",
+        "stances": {
+          "term": "支持 / 反对 / 提及",
+          "text": "「支持」— 片段证实假设；「反对」— 反驳假设；「提及」— 与主题相关但没有直接结论。在假设按知识库核验之前，计数为空。"
+        },
+        "verdict": {
+          "term": "核验结论",
+          "text": "「得到支持」— 有支持且无严重矛盾；「被反驳」— 反驳占多数；「存在矛盾」— 两者兼有；「数据不足」— 该主题的资料太少。"
+        }
+      },
+      "links": {
+        "group": "系统连接什么",
+        "evidenceGraph": {
+          "term": "证据图谱",
+          "text": "将假设与具体文档和片段连接。每条边都标注为支持、反对或提及 — 可以打开来源并核对位置。"
+        },
+        "knowledgeGraph": {
+          "term": "知识图谱",
+          "text": "连接的不是按引用关联的文章，而是提取出的链条：材料 → 工艺 → 性能 → 目标。新的方向从它们的交汇处诞生。"
+        }
+      },
+      "ranking": {
+        "group": "评分由什么构成",
+        "kpiFit": {
+          "term": "目标契合度",
+          "text": "假设在多大程度上真正推动所选指标。"
+        },
+        "evidenceBase": {
+          "term": "证据基础",
+          "text": "找到多少独立片段，是否存在矛盾。"
+        },
+        "novelty": {
+          "term": "新颖性",
+          "text": "方案与已知工作和专利的差异程度。"
+        },
+        "valueRisk": {
+          "term": "价值与风险",
+          "text": "潜在收益与技术限制及副作用的权衡。"
+        },
+        "readiness": {
+          "term": "成熟度",
+          "text": "按 TRL 等级，想法距离实验室验证有多近。"
+        }
+      }
+    },
+    "aiNote": "系统加速研发起步：收集论据和方案，但不能替代工程专业判断、试验计划和对原始来源的核查。",
+    "weightsTitle": "排序权重设置",
+    "weightsDescription": "设置假设优先级中各项标准的权重——将在下次加载看板时应用于您的组合。"
+  },
+  "graph": {
+    "loadError": "无法加载知识图谱",
+    "emptyTitle": "图谱暂时为空",
+    "emptyText": "生成假设 — 它们将连同所依据的文档一起出现在这里。",
+    "stats": {
+      "hypotheses": "假设",
+      "documents": "来源",
+      "links": "证据链接",
+      "totalDocs": "来源总数",
+      "inView": "当前视图",
+      "hiddenDocs_other": "已隐藏 {{count}} 个低信号来源",
+      "grouped": "按节点对分组",
+      "available": "当前范围内可用"
+    },
+    "searchPlaceholder": "搜索假设或来源",
+    "searchAria": "在证据图谱中搜索",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "fit": "适配视图",
+    "focus": "焦点",
+    "selected": "已选择",
+    "noFocus": "选择节点",
+    "hypothesis": "假设",
+    "document": "来源",
+    "source": "来源",
+    "focusType": "类型",
+    "centerSelected": "居中",
+    "openHypothesis": "打开假设",
+    "openSource": "打开来源",
+    "open": "打开",
+    "evidence": "证据",
+    "fragments_other": "{{count}} 个片段",
+    "moreRelated_other": "+{{count}} 个更多",
+    "quickNav": "假设索引",
+    "quickNavHint": "点击某个假设——其来源会在图谱中高亮，证据会在右侧展开",
+    "sourceCount_other": "{{count}} 个来源",
+    "noSources": "暂无来源",
+    "sourceOrigin": {
+      "input": "您的文档",
+      "knowledge": "知识库",
+      "web": "外部来源"
+    },
+    "stances": {
+      "supports": "支持",
+      "contradicts": "反驳",
+      "mixed": "混合",
+      "context": "上下文"
+    },
+    "related": "相关",
+    "noRelated": "当前视图中没有相关节点。",
+    "topHypotheses": "主要假设",
+    "aria": "知识图谱：假设与来源文档",
+    "stanceAll": "所有连接",
+    "nodeLegend": {
+      "supported": "已证实",
+      "refuted": "被反驳",
+      "mixed": "混合",
+      "unverified": "未验证",
+      "document": "来源"
+    }
+  },
+  "report": {
+    "loadError": "无法生成报告",
+    "back": "返回假设看板",
+    "savePdf": "保存为 PDF",
+    "kicker": "假设工厂 · {{date}}",
+    "title": "假设组合报告",
+    "summary": "组合中的假设：{{total}} · 专家已确认：{{approved}} · 目标：{{goals}}",
+    "goalsTitle": "目标及其覆盖",
+    "goalsHead": {
+      "goal": "目标",
+      "target": "基线 → 目标值",
+      "hypotheses": "假设数",
+      "approved": "已确认",
+      "best": "最高优先级"
+    },
+    "rankingTitle": "假设排序",
+    "rankingNote": "优先级按透明公式计算：目标契合度、证据、新颖性、价值、风险、成熟度，并考虑专家决定。",
+    "rankHead": {
+      "num": "序号",
+      "hypothesis": "假设",
+      "priority": "优先级",
+      "novelty": "新颖性",
+      "value": "价值",
+      "risk": "风险",
+      "trl": "TRL",
+      "status": "状态"
+    },
+    "truncated": "显示前 {{shown}} 条，共 {{total}} 条；完整列表见 CSV/JSON 导出。",
+    "footer": "本报告由「假设工厂」自动生成。新颖性、价值和风险评分为模型估计，需专家验证；每条假设均附有系统内来源链接。",
+    "execTitle": "管理层摘要",
+    "execNote": "按技术指数（TechScore）排列的语料库关键技术主题。",
+    "execScore": "技术指数 {{score}}/10",
+    "execCounts": "文档：{{docs}} · 主题假设：{{linked}}",
+    "passportsTitle": "主题档案",
+    "passportScore": "指数 {{score}}/10",
+    "passportSignals": "出版物：{{pubs}} · 机构：{{orgs}} · 主题假设：{{linked}}",
+    "pilotsTitle": "试点假设",
+    "pilotsNote": "按优先级排序的组合前列——首批验证候选。",
+    "pilotCriteria": "成功标准",
+    "pilotRationale": "论证",
+    "pilotConstraints": "已考虑的限制条件",
+    "pilotSources": "世界实践（公开文献）",
+    "saveDocx": "下载 Word",
+    "savingDocx": "正在生成 Word…",
+    "docxError": "无法生成 Word 文件",
+    "docxFileName": "假设组合报告.docx"
+  },
+  "hreport": {
+    "doctype": "R&D 假设报告",
+    "generatedAt": "生成于 {{date}}",
+    "version": "版本 {{n}}",
+    "generatedBy": "由“假设工厂”系统生成：{{kind}}，模型 {{model}}，{{date}}",
+    "ownerLine": "负责人：{{name}}",
+    "goalLine": "目标：{{title}}（{{target}}）",
+    "themeLine": "主题：{{title}}",
+    "expertVerified": "已经专家审核",
+    "expertNotVerified": "尚未经过专家验证",
+    "scientificNote": "科学（不可量化）假设",
+    "forAgainst": "支持 {{forCount}}，反对 {{againstCount}}",
+    "evidenceLine": "{{docs}} 份文档：支持 {{forCount}}，反对 {{againstCount}}",
+    "missing": "缺失：{{missing}}",
+    "trlPending": "评估中",
+    "disclaimer": "新颖性、价值、风险与成熟度评分由模型估算，需专家验证；每项论断均附来源引用。",
+    "p": {
+      "goal": "目标",
+      "theme": "主题",
+      "verdict": "验证结论",
+      "priority": "优先级",
+      "novelty": "新颖性",
+      "value": "价值",
+      "risk": "风险",
+      "confidence": "置信度",
+      "itc": "技术指数",
+      "trl": "成熟度（TRL）",
+      "evidence": "证据",
+      "specialties": "学科方向",
+      "completeness": "档案完整度"
+    },
+    "abstractTitle": "摘要",
+    "a": {
+      "object": "研究对象：{{object}}",
+      "goal": "工作目标：{{title}}（{{target}}）。",
+      "goalProblem": "工作目标：{{problem}}",
+      "data": "数据：知识库文档 {{docs}} 份，外部文献 {{external}} 篇。",
+      "result": "语料自动验证结果：{{verdict}}（支持 {{forCount}}，反对 {{againstCount}}）。",
+      "resultPending": "报告生成时语料自动验证尚未完成。",
+      "recommendation": "建议：{{rec}}",
+      "effect": "预期效果：{{effect}}。"
+    },
+    "keywords": "关键词：{{words}}",
+    "introTitle": "引言",
+    "introGoal": "本工作面向目标“{{title}}”（{{target}}）。",
+    "driversLead": "驱动因素：",
+    "freshnessNote": "该主题的世界实践新鲜度：{{value}}（OpenAlex）。{{rationale}}",
+    "abbreviations": "缩写：TRL — 技术成熟度等级；ITC — 技术指数；KPI — 关键绩效指标。",
+    "sec1Title": "假设及其论证",
+    "rationaleSub": "论证",
+    "constraintsLead": "给定约束：{{constraints}}",
+    "quantTableTitle": "定量参数",
+    "q": {
+      "param": "参数",
+      "value": "数值",
+      "unit": "单位",
+      "role": "作用",
+      "range": "范围"
+    },
+    "materialsSub": "材料学档案",
+    "m": {
+      "system": "材料体系",
+      "composition": "成分调整",
+      "process": "工艺调整",
+      "microstructure": "机理（微观结构）",
+      "property": "目标性能"
+    },
+    "applicationObjects": "应用对象：{{objects}}。",
+    "applicationConditions": "条件：{{conditions}}。",
+    "mechanismSub": "机理：因果链",
+    "causalTableTitle": "因果链 成分 → 工艺 → 微观结构 → 性能 → KPI",
+    "c": {
+      "stage": "阶段",
+      "change": "变化"
+    },
+    "sec2Title": "评分及其解释",
+    "rankingTableTitle": "综合排序因子",
+    "r": {
+      "factor": "因子",
+      "weight": "权重",
+      "value": "数值",
+      "contribution": "贡献",
+      "detail": "说明"
+    },
+    "priorityTotal": "总优先级：{{score}}/100。",
+    "freshnessLabel": "主题新鲜度",
+    "trlLine": "技术成熟度：TRL {{level}} — {{name}}。",
+    "trlMet": "已达成",
+    "trlNotMet": "未达成",
+    "confidenceSub": "验证置信度（分项）",
+    "unverifiedNote": "自动验证尚未完成——请谨慎对待评分。",
+    "learningLine": "复测优先级：{{score}}（检验价值 {{value}}，不确定性 {{uncertainty}}）。",
+    "sec3Title": "支持与反对证据",
+    "noEvidence": "语料证据尚未形成；报告生成时自动验证未完成。",
+    "checkConfidence": "置信度 {{value}}",
+    "checkModel": "模型 {{model}}",
+    "checkedAt": "验证于 {{date}}",
+    "checkPending": "自动验证仍在进行——以下为已收集的语料片段。",
+    "balanceTableTitle": "证据平衡",
+    "b": {
+      "total": "片段总数",
+      "docs": "文档数",
+      "for": "支持",
+      "against": "反对",
+      "context": "背景"
+    },
+    "forSub": "支持性证据",
+    "againstSub": "反对性证据",
+    "noAgainst": "语料中未发现反对性片段。",
+    "moreQuotes": "另有 {{count}} 条支持片段可在系统中查看。",
+    "contextCount": "另考虑了 {{count}} 条背景片段。",
+    "externalSub": "外部文献（世界实践）",
+    "sec4Title": "验证计划",
+    "metricsLead": "指标：",
+    "criteriaLead": "成功标准：",
+    "horizonLine": "验证周期：{{horizon}}。",
+    "roadmapSub": "实验路线图",
+    "processTableTitle": "工艺参数",
+    "pl": {
+      "materials": "材料与试剂",
+      "characterization": "表征方法",
+      "tests": "测试方法",
+      "controls": "对照样品"
+    },
+    "resourcesLine": "资源估算：成本 — {{cost}}，周期 — {{time}}。",
+    "risksLead": "风险与失效模式：",
+    "planModel": "模型 {{model}}",
+    "feasibilityTableTitle": "可行性评估",
+    "f": {
+      "aspect": "方面",
+      "level": "等级",
+      "note": "备注"
+    },
+    "level": {
+      "low": "低",
+      "medium": "中",
+      "high": "高"
+    },
+    "sec5Title": "世界实践与限制",
+    "competitorsTableTitle": "类似与竞争方案",
+    "co": {
+      "name": "名称",
+      "approach": "方法",
+      "maturity": "成熟度",
+      "source": "来源"
+    },
+    "limitationsLead": "适用性限制：",
+    "conclusionTitle": "结论",
+    "conclVerdict": "自动验证结论：{{verdict}}（支持 {{forCount}}，反对 {{againstCount}}）。",
+    "conclVerdictPending": "语料自动验证尚未完成——结论将进一步确认。",
+    "conclReadiness": "成熟度：TRL {{trl}}；技术指数 {{itc}}。",
+    "conclPriority": "组合优先级：{{score}}/100；主要因子 — {{factor}}。",
+    "conclRisk": "关键风险：{{risk}}",
+    "conclLearning": "进一步验证的价值（主动学习）：{{score}}。",
+    "recommendationLead": "建议：{{rec}}。",
+    "recApprove": "按验证计划推进",
+    "recReject": "驳回并记录原因",
+    "recReview": "在专家决策前进一步研究",
+    "recReviewMissing": "需进一步研究：{{missing}}",
+    "recDecide": "需专家决策",
+    "effectLine": "预期效果：{{effect}}。",
+    "referencesTitle": "参考文献",
+    "internalDoc": "{{filename}}。——“假设工厂”知识库文档",
+    "internalSections": "章节：{{sections}}",
+    "pages": "第 {{pages}} 页",
+    "appendixTitle": "附录 A. 生成信息",
+    "g": {
+      "kind": "生成方式",
+      "model": "模型",
+      "mediators": "中介文档数",
+      "scores": "生成评分",
+      "noveltyGate": "新颖性闸门",
+      "nearest": "最近文档：{{file}}",
+      "fallback": "回退原因"
+    },
+    "genKindBridge": "主题间桥接",
+    "genKindCluster": "基于语料主题",
+    "genKindOnDemand": "按目标生成",
+    "genKindFallback": "回退生成",
+    "genKindUnknown": "手动 / 未知",
+    "historyTableTitle": "变更历史",
+    "h": {
+      "no": "№",
+      "date": "日期",
+      "action": "操作",
+      "comment": "备注"
+    },
+    "systemLink": "完整来源片段、假设图谱与历史记录见系统：{{path}}",
+    "fileName": "假设报告-{{id}}.docx",
+    "tableCaption": "表 {{n}} — {{title}}",
+    "backToHypothesis": "返回假设",
+    "conclReadinessTrlOnly": "成熟度：TRL {{trl}}。"
+  }
+}

@@ -1,0 +1,14 @@
+# Git-хуки монорепы (установка: make hooks). Быстрые проверки до коммита —
+# то, что иначе ловил бы только CI.
+pre-commit:
+  parallel: true
+  jobs:
+    - name: frontend fmt+lint
+      glob: "frontend/**/*.{ts,tsx,json,css}"
+      root: frontend/
+      run: bun run fmt && bun run lint
+      stage_fixed: true
+    - name: go fmt
+      glob: "{backend,ml-services}/**/*.go"
+      run: gofmt -w {staged_files}
+      stage_fixed: true

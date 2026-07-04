@@ -1,0 +1,33 @@
+{
+  "jobs": {
+    "generate": "假设生成",
+    "verify": "基于知识库的自动验证",
+    "enrich": "假设补充",
+    "assess_trl": "技术成熟度自动评估",
+    "competitors": "竞争对手分析",
+    "refine": "假设细化",
+    "tag": "假设分类",
+    "fallback": "假设任务"
+  },
+  "workers": {
+    "clusters": "主题：文档分组",
+    "discovery": "主题间桥接",
+    "raptor": "文档摘要",
+    "itc": "技术指数",
+    "eval": "回答质量检查"
+  },
+  "toasts": {
+    "done": "任务已完成",
+    "failed": "任务执行失败"
+  },
+  "notifications": {
+    "bellAria": "后台任务：{{count}}",
+    "bellAriaIdle": "通知",
+    "title": "通知",
+    "inProgress": "{{count}} 个进行中",
+    "system": "系统",
+    "allDone": "所有后台计算已完成——知识库为最新状态。",
+    "empty": "暂无后台任务。",
+    "clearFinished": "清除已完成"
+  }
+}
