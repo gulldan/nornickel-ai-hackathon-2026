@@ -14,7 +14,7 @@
 
 ## Демо
 
-<video src="https://github.com/gulldan/nornickel-ai-hackathon-2026/raw/master/docs/product/presentation/demo.webm" controls width="100%"></video>
+https://github.com/user-attachments/assets/f71ac116-2b32-401c-ac3c-cc6da48188aa
 
 [Скачать демо-ролик](docs/product/presentation/demo.webm) (WebM, ~9 МБ).
 
