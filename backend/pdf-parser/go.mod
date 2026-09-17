@@ -10,7 +10,7 @@ require (
 	github.com/aws/smithy-go v1.27.2
 	github.com/ledongthuc/pdf v0.0.0-20250511090121-5959a4027728
 	github.com/prometheus/client_golang v1.23.2
-	github.com/rabbitmq/amqp091-go v1.11.0
+	github.com/rabbitmq/amqp091-go v1.13.0
 	github.com/rs/zerolog v1.35.1
 	golang.org/x/net v0.56.0
 	google.golang.org/grpc v1.81.1
